@@ -349,12 +349,24 @@ export class GameGateway {
 
   private handleShowdown(tableId: string, state: any) {
     const playersWithChips = state.players.filter((p: any) => p.chips > 0 && !p.sittingOut);
+    console.log(`Showdown: ${playersWithChips.length} players with chips, scheduling new hand...`);
     if (playersWithChips.length >= 2) {
       setTimeout(() => {
+        const table = this.gameService.getTable(tableId);
+        if (!table) {
+          console.log('Table not found, skipping new hand');
+          return;
+        }
+        // Reset phase to allow startGame
+        table.phase = 'waiting';
         const newState = this.gameService.startGame(tableId);
-        if (newState) {
+        if (newState && newState.phase !== 'waiting') {
+          console.log(`New hand started: phase=${newState.phase}`);
           this.broadcastState(tableId);
           this.startTurnTimer(tableId);
+        } else {
+          console.log('Failed to start new hand');
+          this.broadcastState(tableId);
         }
       }, 5000);
     }

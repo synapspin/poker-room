@@ -2,19 +2,24 @@
 
 Real-time multiplayer Texas Hold'em poker room with production-grade connection resilience.
 
-**Stack**: NestJS + Socket.IO | React + Vite | TypeScript
+**Stack**: NestJS + Socket.IO | React + Vite + Tailwind CSS | TypeScript
+
+**Design System**: "The Obsidian Lounge" — premium dark theme with tonal layering, no-line philosophy, ambient green glow
 
 ## Features
 
 - Texas Hold'em engine with full hand evaluation (Royal Flush → High Card)
 - Real-time multiplayer via WebSocket (Socket.IO)
-- Split-panel lobby with live table preview, filtering & sorting
+- **Premium UI**: "The Obsidian Lounge" design system — Tailwind CSS, Manrope + Space Grotesk fonts, Material Symbols icons
+- **Oval poker table** with radial gradient, absolute player positioning, glass-panel effects
+- Split-panel lobby with table cards grid, live preview, filtering & sorting
 - Spectator mode (watch games without playing)
 - Waitlist system (auto-seat when spot opens)
 - **Production-grade reconnection**: persistent identity, 60s grace period, auto-fold/sit-out
 - **Custom heartbeat**: connection quality monitoring (stable/unstable/disconnected)
 - **Action replay queue**: offline action buffering with server-side validation on reconnect
 - Turn timers with auto-actions (30s normal, 15s disconnected)
+- **Per-tab sessions**: each browser tab = separate player (sessionStorage)
 
 ## Quick Start
 

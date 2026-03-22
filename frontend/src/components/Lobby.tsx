@@ -32,6 +32,7 @@ export function Lobby({ socket, playerId, onJoinTable, onCreateTable, onWatchTab
   const [smallBlind, setSmallBlind] = useState(5);
   const [bigBlind, setBigBlind] = useState(10);
   const [waitlistPosition, setWaitlistPosition] = useState(0);
+  const [showPreviewPanel, setShowPreviewPanel] = useState(false);
 
   useEffect(() => {
     socket.emit('lobby:list');
@@ -42,12 +43,8 @@ export function Lobby({ socket, playerId, onJoinTable, onCreateTable, onWatchTab
       onJoinTable(data.tableId);
     };
     const handlePreviewState = (state: GameState) => setPreviewState(state);
-    const handleWaitlistStatus = (data: { position: number; total: number }) => {
-      setWaitlistPosition(data.position);
-    };
-    const handlePromoted = (data: { tableId: string }) => {
-      onJoinTable(data.tableId);
-    };
+    const handleWaitlistStatus = (data: { position: number }) => setWaitlistPosition(data.position);
+    const handlePromoted = (data: { tableId: string }) => onJoinTable(data.tableId);
 
     socket.on('lobby:tables', handleTables);
     socket.on('lobby:created', handleCreated);
@@ -61,22 +58,16 @@ export function Lobby({ socket, playerId, onJoinTable, onCreateTable, onWatchTab
       socket.off('game:preview:state', handlePreviewState);
       socket.off('game:waitlist:status', handleWaitlistStatus);
       socket.off('game:waitlist:promoted', handlePromoted);
-      // Unsubscribe from any active preview
-      if (selectedTableId) {
-        socket.emit('game:unpreview', { tableId: selectedTableId });
-      }
+      if (selectedTableId) socket.emit('game:unpreview', { tableId: selectedTableId });
     };
   }, [socket, onJoinTable]);
 
   const handleSelectTable = useCallback((tableId: string) => {
-    // Unsubscribe from previous preview
-    if (selectedTableId) {
-      socket.emit('game:unpreview', { tableId: selectedTableId });
-    }
+    if (selectedTableId) socket.emit('game:unpreview', { tableId: selectedTableId });
     setSelectedTableId(tableId);
     setPreviewState(null);
     setWaitlistPosition(0);
-    // Subscribe to new preview
+    setShowPreviewPanel(true);
     socket.emit('game:preview', { tableId });
   }, [socket, selectedTableId]);
 
@@ -92,156 +83,114 @@ export function Lobby({ socket, playerId, onJoinTable, onCreateTable, onWatchTab
     socket.emit('game:waitlist:leave', { tableId });
   }, [socket]);
 
-  // Filter and sort tables
   const filteredTables = useMemo(() => {
     let result = [...tables];
-
-    // Phase filter
-    if (filters.phase === 'waiting') {
-      result = result.filter(t => t.phase === 'waiting');
-    } else if (filters.phase === 'playing') {
-      result = result.filter(t => t.phase !== 'waiting');
-    }
-
-    // Blinds range
-    if (filters.minBlind > 0) {
-      result = result.filter(t => t.bigBlind >= filters.minBlind);
-    }
-    if (filters.maxBlind > 0) {
-      result = result.filter(t => t.bigBlind <= filters.maxBlind);
-    }
-
-    // Has seats
-    if (filters.hasSeats) {
-      result = result.filter(t => t.playerCount < t.maxPlayers);
-    }
-
-    // Sort
+    if (filters.phase === 'waiting') result = result.filter(t => t.phase === 'waiting');
+    else if (filters.phase === 'playing') result = result.filter(t => t.phase !== 'waiting');
+    if (filters.minBlind > 0) result = result.filter(t => t.bigBlind >= filters.minBlind);
+    if (filters.maxBlind > 0) result = result.filter(t => t.bigBlind <= filters.maxBlind);
+    if (filters.hasSeats) result = result.filter(t => t.playerCount < t.maxPlayers);
     const dir = filters.sortDir === 'asc' ? 1 : -1;
     result.sort((a, b) => {
       switch (filters.sortBy) {
-        case 'name':
-          return dir * a.name.localeCompare(b.name);
-        case 'players':
-          return dir * (a.playerCount - b.playerCount);
-        case 'blinds':
-          return dir * (a.bigBlind - b.bigBlind);
-        default:
-          return 0;
+        case 'name': return dir * a.name.localeCompare(b.name);
+        case 'players': return dir * (a.playerCount - b.playerCount);
+        case 'blinds': return dir * (a.bigBlind - b.bigBlind);
+        default: return 0;
       }
     });
-
     return result;
   }, [tables, filters]);
 
   const selectedTableInfo = tables.find(t => t.id === selectedTableId) ?? null;
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Top bar: filters + create */}
-      <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
-        <div style={{ flex: 1 }}>
+    <div className="h-full flex flex-col gap-5 p-6">
+      {/* Top section: filters + create */}
+      <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex-1 min-w-0">
           <TableFilters filters={filters} onChange={setFilters} />
         </div>
         <button
           onClick={() => setShowCreate(!showCreate)}
-          style={{
-            background: '#4ecca3',
-            color: '#1a1a2e',
-            padding: '0 20px',
-            borderRadius: 8,
-            whiteSpace: 'nowrap',
-          }}
+          className="px-5 py-2.5 bg-primary text-on-primary font-headline font-bold text-xs uppercase tracking-wider rounded-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200 whitespace-nowrap"
         >
-          {showCreate ? 'Cancel' : '+ Create Table'}
+          {showCreate ? 'Cancel' : '+ New Table'}
         </button>
       </div>
 
       {/* Create form */}
       {showCreate && (
-        <div style={{
-          background: '#16213e',
-          padding: 16,
-          borderRadius: 8,
-          display: 'flex',
-          gap: 12,
-          alignItems: 'end',
-        }}>
-          <label style={{ flex: 2 }}>
-            <span style={{ fontSize: 12, color: '#888' }}>Table name</span>
+        <div className="bg-surface-container-low rounded-xl p-5 flex flex-wrap gap-4 items-end">
+          <div className="flex-[2] min-w-[140px]">
+            <label className="block font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-1">Table Name</label>
             <input
-              placeholder="My Table"
+              placeholder="The Diamond Den"
               value={tableName}
               onChange={e => setTableName(e.target.value)}
-              style={{ width: '100%', marginTop: 4 }}
+              className="w-full bg-surface-container-highest border-none rounded-lg py-2.5 px-3 text-on-surface font-body text-sm placeholder:text-outline focus:ring-1 focus:ring-primary/40 focus:outline-none"
             />
-          </label>
-          <label style={{ flex: 1 }}>
-            <span style={{ fontSize: 12, color: '#888' }}>SB</span>
+          </div>
+          <div className="flex-1 min-w-[80px]">
+            <label className="block font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-1">Small Blind</label>
             <input
               type="number"
               value={smallBlind}
               onChange={e => setSmallBlind(Number(e.target.value))}
-              style={{ width: '100%', marginTop: 4 }}
+              className="w-full bg-surface-container-highest border-none rounded-lg py-2.5 px-3 text-on-surface font-label text-sm focus:ring-1 focus:ring-primary/40 focus:outline-none"
             />
-          </label>
-          <label style={{ flex: 1 }}>
-            <span style={{ fontSize: 12, color: '#888' }}>BB</span>
+          </div>
+          <div className="flex-1 min-w-[80px]">
+            <label className="block font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-1">Big Blind</label>
             <input
               type="number"
               value={bigBlind}
               onChange={e => setBigBlind(Number(e.target.value))}
-              style={{ width: '100%', marginTop: 4 }}
+              className="w-full bg-surface-container-highest border-none rounded-lg py-2.5 px-3 text-on-surface font-label text-sm focus:ring-1 focus:ring-primary/40 focus:outline-none"
             />
-          </label>
-          <button onClick={handleCreate} style={{ background: '#e94560', color: '#fff', padding: '8px 20px' }}>
+          </div>
+          <button
+            onClick={handleCreate}
+            className="px-6 py-2.5 bg-primary text-on-primary font-headline font-bold text-xs uppercase tracking-wider rounded-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200"
+          >
             Create & Join
           </button>
         </div>
       )}
 
-      {/* Split panel: table list + preview */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        gap: 12,
-        minHeight: 0,
-      }}>
-        {/* Left: table list */}
-        <div style={{
-          width: '35%',
-          minWidth: 240,
-          overflowY: 'auto',
-          background: '#111827',
-          borderRadius: 8,
-          padding: 8,
-        }}>
+      {/* Main area: table grid + preview panel */}
+      <div className="flex-1 flex gap-5 min-h-0 overflow-hidden">
+        {/* Tables grid — scrollable */}
+        <div className={`flex-1 overflow-y-auto no-scrollbar ${showPreviewPanel ? 'hidden lg:block' : ''}`}>
           <TableList
             tables={filteredTables}
             selectedId={selectedTableId}
             onSelect={handleSelectTable}
+            onJoin={onJoinTable}
           />
         </div>
 
-        {/* Right: preview */}
-        <div style={{
-          flex: 1,
-          background: '#111827',
-          borderRadius: 8,
-          padding: 16,
-          overflowY: 'auto',
-        }}>
-          <TablePreview
-            tableInfo={selectedTableInfo}
-            previewState={previewState}
-            playerId={playerId}
-            onJoin={onJoinTable}
-            onWatch={onWatchTable}
-            onWaitlistJoin={handleWaitlistJoin}
-            onWaitlistLeave={handleWaitlistLeave}
-            waitlistPosition={waitlistPosition}
-          />
-        </div>
+        {/* Preview panel — right side on large screens, overlay on small */}
+        {showPreviewPanel && selectedTableInfo && (
+          <div className="w-full lg:w-[380px] lg:flex-shrink-0 relative">
+            <button
+              onClick={() => setShowPreviewPanel(false)}
+              className="lg:hidden absolute top-3 right-3 z-10 p-1 rounded-full bg-surface-container-highest text-on-surface-variant hover:text-on-surface"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
+            <TablePreview
+              tableInfo={selectedTableInfo}
+              previewState={previewState}
+              playerId={playerId}
+              onJoin={onJoinTable}
+              onWatch={onWatchTable}
+              onWaitlistJoin={handleWaitlistJoin}
+              onWaitlistLeave={handleWaitlistLeave}
+              waitlistPosition={waitlistPosition}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

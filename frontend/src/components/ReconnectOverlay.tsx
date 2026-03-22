@@ -7,48 +7,19 @@ export function ReconnectOverlay({ reconnecting, attempt }: ReconnectOverlayProp
   if (!reconnecting) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(0, 0, 0, 0.75)',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-    }}>
-      <div style={{
-        background: '#16213e',
-        padding: '32px 48px',
-        borderRadius: 12,
-        textAlign: 'center',
-        border: '2px solid #e94560',
-      }}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-surface/80 backdrop-blur-xl">
+      <div className="glass-panel rounded-xl p-10 text-center max-w-sm">
         {/* Spinner */}
-        <div style={{
-          width: 40,
-          height: 40,
-          border: '3px solid #333',
-          borderTopColor: '#e94560',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-          margin: '0 auto 16px',
-        }} />
+        <div className="w-12 h-12 border-2 border-surface-container-highest border-t-primary rounded-full mx-auto mb-6" style={{ animation: 'spin 1s linear infinite' }} />
 
-        <h3 style={{ color: '#e94560', margin: '0 0 8px' }}>Connection Lost</h3>
-        <p style={{ color: '#888', fontSize: 14, margin: 0 }}>
+        <h3 className="font-headline font-bold text-xl text-on-surface mb-2">Connection Lost</h3>
+        <p className="font-label text-xs text-on-surface-variant uppercase tracking-wider mb-1">
           Reconnecting... (attempt {attempt})
         </p>
-        <p style={{ color: '#555', fontSize: 12, marginTop: 8 }}>
+        <p className="font-label text-[10px] text-outline uppercase tracking-[0.15em]">
           Your seat is reserved for 60 seconds
         </p>
       </div>
-
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

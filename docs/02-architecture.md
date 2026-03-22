@@ -29,25 +29,36 @@ poker-room/
 │   │   ├── main.tsx                 # ReactDOM entry
 │   │   ├── App.tsx                  # Root: screens, socket, heartbeat, action queue
 │   │   ├── types.ts                 # Shared TypeScript interfaces
-│   │   ├── index.css                # Global dark theme styles
+│   │   ├── index.css                # Tailwind CSS + Obsidian Lounge @theme tokens
 │   │   ├── hooks/
-│   │   │   ├── useSocket.ts         # Socket.IO connection + auto-reconnect
+│   │   │   ├── useSocket.ts         # Socket.IO connection + auto-reconnect (sessionStorage)
 │   │   │   ├── useHeartbeat.ts      # Custom heartbeat (5s interval, quality, latency)
 │   │   │   └── useActionQueue.ts    # Offline action buffer + replay on reconnect
 │   │   └── components/
-│   │       ├── Login.tsx            # Player name input
-│   │       ├── Lobby.tsx            # Split-panel: filters + table list + preview
-│   │       ├── TableFilters.tsx     # Phase, blinds, seats, sort controls
-│   │       ├── TableList.tsx        # Scrollable table list with selection
-│   │       ├── TablePreview.tsx     # Readonly table view + Join/Watch/Waitlist
-│   │       ├── Table.tsx            # Full game UI: cards, actions, timers, badges
-│   │       ├── CardView.tsx         # Single card renderer (rank + suit symbol)
-│   │       ├── TurnTimerBar.tsx     # Animated countdown bar (green→yellow→red)
-│   │       └── ReconnectOverlay.tsx # "Connection Lost" overlay with spinner
-│   ├── index.html
-│   ├── vite.config.ts
+│   │       ├── ui/
+│   │       │   ├── Layout.tsx       # App shell: header + sidebar + content
+│   │       │   ├── Header.tsx       # Top nav: logo, wallet, quality indicator
+│   │       │   └── Sidebar.tsx      # Left nav + mobile bottom nav
+│   │       ├── Login.tsx            # "Enter the Lounge" — name input
+│   │       ├── Lobby.tsx            # Table cards grid + preview panel
+│   │       ├── TableFilters.tsx     # Phase tabs, blinds range, sort controls
+│   │       ├── TableList.tsx        # Card grid with badges, metrics, avatars
+│   │       ├── TablePreview.tsx     # Glass panel: live preview + Join/Watch
+│   │       ├── Table.tsx            # Oval poker table, absolute seats, action bar
+│   │       ├── CardView.tsx         # 3 sizes, inverse-surface bg, suit colors
+│   │       ├── TurnTimerBar.tsx     # Thin animated bar (primary→secondary→error)
+│   │       └── ReconnectOverlay.tsx # Glass panel + backdrop-blur overlay
+│   ├── index.html                   # Google Fonts (Manrope, Space Grotesk, Material Symbols)
+│   ├── postcss.config.js
+│   ├── vite.config.ts               # React + Tailwind CSS v4 plugin
 │   ├── tsconfig.json
 │   └── package.json
+├── design/                          # Design mockups (HTML + screenshots)
+│   ├── lobby/                       # Lobby screen mockup
+│   ├── game_table/                  # Game table mockup
+│   ├── cashier/                     # Cashier screen mockup
+│   ├── player_profile/              # Profile dashboard mockup
+│   └── royal_felt_steel/DESIGN.md   # "The Obsidian Lounge" design system spec
 ├── docs/                            # Documentation
 ├── package.json                     # npm workspaces root
 └── .gitignore

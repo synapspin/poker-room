@@ -9,30 +9,19 @@ interface TablePreviewProps {
   onWatch: (tableId: string) => void;
   onWaitlistJoin: (tableId: string) => void;
   onWaitlistLeave: (tableId: string) => void;
-  waitlistPosition: number; // 0 = not in waitlist
+  waitlistPosition: number;
 }
 
 export function TablePreview({
-  tableInfo,
-  previewState,
-  playerId,
-  onJoin,
-  onWatch,
-  onWaitlistJoin,
-  onWaitlistLeave,
-  waitlistPosition,
+  tableInfo, previewState, playerId,
+  onJoin, onWatch, onWaitlistJoin, onWaitlistLeave, waitlistPosition,
 }: TablePreviewProps) {
   if (!tableInfo) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        color: '#555',
-        fontSize: 15,
-      }}>
-        Select a table to preview
+      <div className="glass-panel rounded-xl h-full flex flex-col items-center justify-center text-on-surface-variant p-8">
+        <span className="material-symbols-outlined text-5xl mb-4 text-outline/50">playing_cards</span>
+        <p className="font-headline font-bold text-lg">Select a Table</p>
+        <p className="text-xs font-label uppercase tracking-wider mt-1">Click any table to preview the action</p>
       </div>
     );
   }
@@ -42,157 +31,113 @@ export function TablePreview({
   const isInWaitlist = waitlistPosition > 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Table header */}
-      <div style={{
-        padding: '12px 16px',
-        background: '#16213e',
-        borderRadius: 8,
-        marginBottom: 12,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
+    <div className="glass-panel rounded-xl h-full flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="p-5 flex justify-between items-start">
         <div>
-          <h3 style={{ margin: 0, fontSize: 16 }}>{tableInfo.name}</h3>
-          <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
-            {tableInfo.playerCount}/{tableInfo.maxPlayers} players
-            &nbsp;|&nbsp;Blinds: {tableInfo.smallBlind}/{tableInfo.bigBlind}
-            &nbsp;|&nbsp;{tableInfo.phase === 'waiting' ? 'Waiting' : `Phase: ${tableInfo.phase}`}
+          <h3 className="font-headline font-bold text-xl text-on-surface">{tableInfo.name}</h3>
+          <div className="flex items-center gap-3 mt-1">
+            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">
+              {tableInfo.playerCount}/{tableInfo.maxPlayers} players
+            </span>
+            <span className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">
+              ${tableInfo.smallBlind}/${tableInfo.bigBlind}
+            </span>
+            <span className={`font-label text-[10px] uppercase tracking-[0.2em] ${tableInfo.phase === 'waiting' ? 'text-on-surface-variant' : 'text-primary'}`}>
+              {tableInfo.phase}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Live preview area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {/* Preview area */}
+      <div className="flex-1 px-5 overflow-y-auto no-scrollbar">
         {previewState && previewState.players.length > 0 ? (
           <>
-            {/* Community cards */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 6,
-              padding: 16,
-              background: '#0f3460',
-              borderRadius: 80,
-              minHeight: 90,
-              alignItems: 'center',
-              marginBottom: 12,
-            }}>
+            {/* Mini table */}
+            <div className="poker-table-gradient rounded-[80px] py-6 px-8 flex items-center justify-center gap-2 mb-4 min-h-[80px]">
               {previewState.communityCards.length > 0
-                ? previewState.communityCards.map((card, i) => <CardView key={i} card={card} />)
-                : <span style={{ color: '#445' }}>No community cards yet</span>
+                ? previewState.communityCards.map((card, i) => <CardView key={i} card={card} size="sm" />)
+                : <span className="text-outline/30 font-label text-xs uppercase tracking-wider">No cards yet</span>
               }
             </div>
 
             {/* Pot */}
             {previewState.pot > 0 && (
-              <div style={{ textAlign: 'center', marginBottom: 12, color: '#e94560', fontWeight: 600 }}>
-                Pot: {previewState.pot}
+              <div className="text-center mb-3">
+                <span className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Pot</span>
+                <span className="ml-2 font-label font-bold text-primary">${previewState.pot}</span>
               </div>
             )}
 
             {/* Winners */}
             {previewState.phase === 'showdown' && previewState.winners && (
-              <div style={{
-                textAlign: 'center',
-                padding: 8,
-                marginBottom: 12,
-                background: '#4ecca3',
-                color: '#1a1a2e',
-                borderRadius: 6,
-                fontWeight: 700,
-                fontSize: 13,
-              }}>
+              <div className="mb-3 py-2 px-4 rounded-lg bg-primary/10 text-center">
                 {previewState.winners.map((w, i) => {
                   const wp = previewState.players.find(p => p.playerId === w.playerId);
-                  return <div key={i}>{wp?.name} wins {w.amount} with {w.hand}</div>;
+                  return (
+                    <div key={i} className="font-label text-xs text-primary font-bold">
+                      {wp?.name} wins ${w.amount} — {w.hand}
+                    </div>
+                  );
                 })}
               </div>
             )}
 
-            {/* Players grid */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-              gap: 8,
-              marginBottom: 12,
-            }}>
+            {/* Players */}
+            <div className="grid grid-cols-2 gap-2 mb-4">
               {previewState.players.map((player, idx) => {
-                const isCurrentTurn = idx === previewState.currentPlayerIndex
-                  && previewState.phase !== 'waiting'
-                  && previewState.phase !== 'showdown';
-                const isDealer = idx === previewState.dealerIndex;
-
+                const isTurn = idx === previewState.currentPlayerIndex
+                  && previewState.phase !== 'waiting' && previewState.phase !== 'showdown';
                 return (
                   <div
                     key={player.playerId}
-                    style={{
-                      background: '#16213e',
-                      padding: 8,
-                      borderRadius: 6,
-                      border: isCurrentTurn ? '2px solid #e94560' : '2px solid transparent',
-                      opacity: player.folded ? 0.5 : 1,
-                      fontSize: 13,
-                    }}
+                    className={`bg-surface-container-highest rounded-lg p-3 transition-all duration-200
+                      ${isTurn ? 'ring-1 ring-primary/40' : ''}
+                      ${player.folded || player.sittingOut ? 'opacity-40' : ''}`}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontWeight: 600 }}>
-                        {player.name} {isDealer ? 'D' : ''}
-                      </span>
-                      <span style={{ color: '#4ecca3' }}>{player.chips}</span>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-body text-xs font-semibold text-on-surface truncate">{player.name}</span>
+                      <span className="font-label text-[10px] text-primary font-bold">${player.chips}</span>
                     </div>
-                    <div style={{ display: 'flex', gap: 3 }}>
+                    <div className="flex gap-1">
                       {player.cards.length > 0
-                        ? player.cards.map((card, i) => <CardView key={i} card={card} />)
-                        : previewState.phase !== 'waiting' && <><CardView hidden /><CardView hidden /></>
+                        ? player.cards.map((c, i) => <CardView key={i} card={c} size="sm" />)
+                        : previewState.phase !== 'waiting' && !player.sittingOut && <><CardView hidden size="sm" /><CardView hidden size="sm" /></>
                       }
                     </div>
-                    <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
-                      {player.folded && 'Folded'}
-                      {player.allIn && 'ALL IN'}
-                      {player.bet > 0 && !player.folded && !player.allIn && `Bet: ${player.bet}`}
-                    </div>
+                    {player.disconnected && (
+                      <span className="inline-block mt-1 text-[8px] font-label uppercase tracking-wider text-error">Offline</span>
+                    )}
                   </div>
                 );
               })}
             </div>
           </>
         ) : (
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#555',
-            fontSize: 14,
-          }}>
-            {tableInfo.playerCount === 0 ? 'Empty table — be the first to join!' : 'Loading preview...'}
+          <div className="flex-1 flex items-center justify-center text-on-surface-variant py-12">
+            <p className="font-label text-xs uppercase tracking-wider">
+              {tableInfo.playerCount === 0 ? 'Empty table' : 'Loading preview...'}
+            </p>
           </div>
         )}
       </div>
 
       {/* Action buttons */}
-      <div style={{
-        display: 'flex',
-        gap: 8,
-        padding: '12px 0',
-        borderTop: '1px solid #333',
-        marginTop: 'auto',
-      }}>
+      <div className="p-5 flex gap-3 border-t border-outline-variant/10">
         {!isAlreadySeated && !isFull && (
           <button
             onClick={() => onJoin(tableInfo.id)}
-            style={{ flex: 1, background: '#4ecca3', color: '#1a1a2e', padding: 10 }}
+            className="flex-1 py-2.5 bg-primary text-on-primary font-label text-xs font-bold uppercase tracking-wider rounded-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200"
           >
-            Join Table
+            Take a Seat
           </button>
         )}
 
         {!isAlreadySeated && isFull && !isInWaitlist && (
           <button
             onClick={() => onWaitlistJoin(tableInfo.id)}
-            style={{ flex: 1, background: '#f0a500', color: '#1a1a2e', padding: 10 }}
+            className="flex-1 py-2.5 bg-secondary/10 text-secondary font-label text-xs font-bold uppercase tracking-wider rounded-lg border border-secondary/20 hover:bg-secondary/20 active:scale-[0.98] transition-all duration-200"
           >
             Join Waitlist
           </button>
@@ -201,7 +146,7 @@ export function TablePreview({
         {isInWaitlist && (
           <button
             onClick={() => onWaitlistLeave(tableInfo.id)}
-            style={{ flex: 1, background: '#666', color: '#fff', padding: 10 }}
+            className="flex-1 py-2.5 bg-surface-container-highest text-on-surface-variant font-label text-xs font-bold uppercase tracking-wider rounded-lg hover:text-on-surface active:scale-[0.98] transition-all duration-200"
           >
             Leave Waitlist (#{waitlistPosition})
           </button>
@@ -209,9 +154,9 @@ export function TablePreview({
 
         <button
           onClick={() => onWatch(tableInfo.id)}
-          style={{ flex: 1, background: '#0f3460', color: '#eee', padding: 10 }}
+          className="flex-1 py-2.5 bg-surface-container-highest text-on-surface-variant font-label text-xs font-bold uppercase tracking-wider rounded-lg hover:text-on-surface active:scale-[0.98] transition-all duration-200"
         >
-          Watch as Spectator
+          Spectate
         </button>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSocket } from './hooks/useSocket';
 import { useHeartbeat } from './hooks/useHeartbeat';
 import { useActionQueue } from './hooks/useActionQueue';
+import { Layout } from './components/ui/Layout';
 import { Login } from './components/Login';
 import { Lobby } from './components/Lobby';
 import { Table } from './components/Table';
@@ -37,7 +38,6 @@ export default function App() {
     }) => {
       setPlayer(data.player);
       saveUserId(data.player.userId);
-
       if (data.screen === 'table' && data.activeTableId && data.gameState) {
         setCurrentTableId(data.activeTableId);
         setGameState(data.gameState);
@@ -101,99 +101,62 @@ export default function App() {
   }, [socket, currentTableId, screen, clearQueue]);
 
   const handleStartGame = useCallback(() => {
-    if (currentTableId) {
-      socket?.emit('game:start', { tableId: currentTableId });
-    }
+    if (currentTableId) socket?.emit('game:start', { tableId: currentTableId });
   }, [socket, currentTableId]);
 
-  // Use action queue for game actions (supports offline buffering + replay)
   const handleAction = useCallback((action: string, amount?: number) => {
     enqueueAction(action, amount);
   }, [enqueueAction]);
 
   const handleSitOut = useCallback(() => {
-    if (currentTableId) {
-      socket?.emit('game:sitout', { tableId: currentTableId });
-    }
+    if (currentTableId) socket?.emit('game:sitout', { tableId: currentTableId });
   }, [socket, currentTableId]);
 
   const handleSitBack = useCallback(() => {
-    if (currentTableId) {
-      socket?.emit('game:sitback', { tableId: currentTableId });
-    }
+    if (currentTableId) socket?.emit('game:sitback', { tableId: currentTableId });
   }, [socket, currentTableId]);
 
-  // Connection quality indicator color
-  const qualityColor = quality === 'stable' ? '#4ecca3' : quality === 'unstable' ? '#f0a500' : '#e94560';
+  const handleNavigate = useCallback((target: string) => {
+    if (target === 'lobby') {
+      if (currentTableId) {
+        if (screen === 'spectator') socket?.emit('game:unspectate', { tableId: currentTableId });
+        else if (screen === 'table') socket?.emit('game:leave', { tableId: currentTableId });
+        setCurrentTableId(null);
+        setGameState(null);
+        clearQueue();
+      }
+      setScreen('lobby');
+    }
+    // profile/cashier/tables — future screens, for now go to lobby
+  }, [socket, currentTableId, screen, clearQueue]);
+
+  // Login screen — no layout shell
+  if (screen === 'login') {
+    return (
+      <>
+        <ReconnectOverlay reconnecting={reconnecting} attempt={reconnectAttempt} />
+        <Login onLogin={handleLogin} />
+      </>
+    );
+  }
+
+  const isTableScreen = screen === 'table' || screen === 'spectator';
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <>
       <ReconnectOverlay reconnecting={reconnecting} attempt={reconnectAttempt} />
 
-      {!connected && !reconnecting && player && (
-        <div style={{
-          padding: '8px 24px',
-          background: '#e94560',
-          color: '#fff',
-          textAlign: 'center',
-          fontSize: 13,
-          fontWeight: 600,
-        }}>
-          Connection lost. Waiting to reconnect...
-          {pendingCount > 0 && ` (${pendingCount} action${pendingCount > 1 ? 's' : ''} queued)`}
-        </div>
-      )}
-
-      {/* Unstable connection warning */}
-      {connected && quality === 'unstable' && (
-        <div style={{
-          padding: '4px 24px',
-          background: '#f0a500',
-          color: '#1a1a2e',
-          textAlign: 'center',
-          fontSize: 12,
-          fontWeight: 600,
-        }}>
-          Unstable connection detected ({latency}ms)
-        </div>
-      )}
-
-      <header style={{
-        padding: '10px 24px',
-        background: '#16213e',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '2px solid #e94560',
-        flexShrink: 0,
-      }}>
-        <h1 style={{ fontSize: 20, color: '#e94560', margin: 0 }}>Poker Room</h1>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          {player && <span>Player: <b>{player.name}</b></span>}
-          {connected && latency > 0 && (
-            <span style={{ fontSize: 11, color: '#888' }}>{latency}ms</span>
-          )}
-          <span
-            title={`${quality} (${latency}ms)`}
-            style={{
-              width: 8, height: 8, borderRadius: '50%',
-              background: qualityColor,
-              display: 'inline-block',
-              boxShadow: quality === 'unstable' ? '0 0 6px #f0a500' : 'none',
-            }}
-          />
-        </div>
-      </header>
-
-      <main style={{
-        flex: 1,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: screen === 'lobby' ? 'stretch' : 'center',
-        padding: screen === 'lobby' ? 16 : 24,
-        minHeight: 0,
-      }}>
-        {screen === 'login' && <Login onLogin={handleLogin} />}
+      <Layout
+        playerName={player?.name ?? null}
+        chips={player?.chips ?? 0}
+        connected={connected}
+        quality={quality}
+        latency={latency}
+        activeScreen={isTableScreen ? 'tables' : 'lobby'}
+        onNavigate={handleNavigate}
+        showSidebar={!isTableScreen}
+        fullWidth={isTableScreen}
+      >
         {screen === 'lobby' && socket && player && (
           <Lobby
             socket={socket}
@@ -203,6 +166,7 @@ export default function App() {
             onWatchTable={handleWatchTable}
           />
         )}
+
         {screen === 'table' && gameState && player && (
           <Table
             gameState={gameState}
@@ -215,6 +179,7 @@ export default function App() {
             pendingActions={pendingCount}
           />
         )}
+
         {screen === 'spectator' && gameState && player && (
           <Table
             gameState={gameState}
@@ -225,15 +190,17 @@ export default function App() {
             spectator
           />
         )}
-        {(screen === 'table' || screen === 'spectator') && !gameState && (
-          <div>
-            <p>Waiting for game state...</p>
-            <button onClick={handleLeaveTable} style={{ marginTop: 12, background: '#e94560', color: '#fff' }}>
+
+        {isTableScreen && !gameState && (
+          <div className="flex flex-col items-center justify-center h-96 text-on-surface-variant">
+            <span className="material-symbols-outlined text-4xl mb-4 animate-pulse">hourglass_empty</span>
+            <p className="font-headline font-bold">Loading table...</p>
+            <button onClick={handleLeaveTable} className="mt-4 px-6 py-2 bg-surface-container-highest rounded-lg font-label text-xs uppercase tracking-wider hover:text-on-surface transition-colors duration-200">
               Back to Lobby
             </button>
           </div>
         )}
-      </main>
-    </div>
+      </Layout>
+    </>
   );
 }

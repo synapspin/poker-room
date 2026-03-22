@@ -7,55 +7,39 @@ const suitSymbols: Record<string, string> = {
   spades: '\u2660',
 };
 
-const suitColors: Record<string, string> = {
-  hearts: '#e94560',
-  diamonds: '#e94560',
-  clubs: '#eee',
-  spades: '#eee',
-};
+const isRed = (suit: string) => suit === 'hearts' || suit === 'diamonds';
 
 interface CardViewProps {
   card?: Card;
   hidden?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function CardView({ card, hidden }: CardViewProps) {
+const sizes = {
+  sm: 'w-10 h-14 text-xs',
+  md: 'w-14 h-20 text-sm',
+  lg: 'w-20 h-28 text-base',
+};
+
+export function CardView({ card, hidden, size = 'md' }: CardViewProps) {
   if (!card || hidden) {
     return (
-      <div style={{
-        width: 50,
-        height: 70,
-        borderRadius: 6,
-        background: 'linear-gradient(135deg, #e94560, #0f3460)',
-        border: '2px solid #444',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 20,
-        color: '#fff',
-      }}>
-        ?
+      <div className={`${sizes[size]} rounded-lg bg-gradient-to-br from-surface-container-highest to-surface-container-high flex items-center justify-center ghost-border`}>
+        <span className="material-symbols-outlined text-primary/30">style</span>
       </div>
     );
   }
 
+  const red = isRed(card.suit);
+
   return (
-    <div style={{
-      width: 50,
-      height: 70,
-      borderRadius: 6,
-      background: '#fff',
-      border: '2px solid #ddd',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: 14,
-      fontWeight: 700,
-      color: suitColors[card.suit] || '#333',
-    }}>
-      <span>{card.rank}</span>
-      <span style={{ fontSize: 18 }}>{suitSymbols[card.suit] || '?'}</span>
+    <div className={`${sizes[size]} rounded-lg bg-inverse-surface flex flex-col items-center justify-center font-label font-bold shadow-xl`}>
+      <span className={red ? 'text-tertiary' : 'text-surface-container-lowest'}>
+        {card.rank}
+      </span>
+      <span className={`text-lg ${red ? 'text-tertiary' : 'text-surface-container-lowest'}`}>
+        {suitSymbols[card.suit] || '?'}
+      </span>
     </div>
   );
 }

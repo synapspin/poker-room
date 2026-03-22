@@ -25,8 +25,9 @@ export function useSocket() {
       setReconnecting(false);
       setReconnectAttempt(0);
 
-      // Try to reconnect with saved userId
-      const savedUserId = localStorage.getItem(USER_ID_KEY);
+      // sessionStorage = per-tab identity (survives refresh, not new tabs)
+      // New tab = new user, Refresh = reconnect same user
+      const savedUserId = sessionStorage.getItem(USER_ID_KEY);
       if (savedUserId) {
         socket.emit('player:reconnect', { userId: savedUserId });
       }
@@ -51,10 +52,12 @@ export function useSocket() {
   }, []);
 
   const saveUserId = useCallback((userId: string) => {
+    sessionStorage.setItem(USER_ID_KEY, userId);
     localStorage.setItem(USER_ID_KEY, userId);
   }, []);
 
   const clearUserId = useCallback(() => {
+    sessionStorage.removeItem(USER_ID_KEY);
     localStorage.removeItem(USER_ID_KEY);
   }, []);
 

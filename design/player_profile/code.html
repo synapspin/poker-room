@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VIP Player Profile | The Obsidian Lounge</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#535559",
+              "on-primary": "#005d2c",
+              "secondary-fixed": "#ffd709",
+              "primary-dim": "#24f07e",
+              "primary-fixed-dim": "#24f07e",
+              "background": "#0c0e11",
+              "primary-container": "#13ea79",
+              "on-secondary-container": "#fff7e6",
+              "surface-container": "#171a1d",
+              "tertiary": "#ff7162",
+              "on-secondary": "#5b4b00",
+              "error-dim": "#d7383b",
+              "tertiary-container": "#f9362c",
+              "surface-variant": "#23262a",
+              "tertiary-dim": "#e2241f",
+              "on-tertiary-container": "#000000",
+              "surface-tint": "#3fff8b",
+              "surface-dim": "#0c0e11",
+              "surface-container-lowest": "#000000",
+              "error": "#ff716c",
+              "surface-container-low": "#111417",
+              "on-primary-fixed-variant": "#006832",
+              "on-primary-fixed": "#004820",
+              "on-tertiary-fixed": "#3a0001",
+              "secondary": "#ffd709",
+              "on-primary-container": "#004f24",
+              "outline-variant": "#46484b",
+              "surface-bright": "#292c31",
+              "on-surface-variant": "#aaabaf",
+              "on-error": "#490006",
+              "error-container": "#9f0519",
+              "outline": "#747579",
+              "surface": "#0c0e11",
+              "surface-container-highest": "#23262a",
+              "on-background": "#f9f9fd",
+              "inverse-surface": "#f9f9fd",
+              "primary-fixed": "#3fff8b",
+              "on-error-container": "#ffa8a3",
+              "tertiary-fixed-dim": "#ff7c6c",
+              "secondary-dim": "#efc900",
+              "on-secondary-fixed-variant": "#665500",
+              "secondary-container": "#705d00",
+              "on-tertiary": "#4a0001",
+              "on-tertiary-fixed-variant": "#7a0004",
+              "inverse-primary": "#006e35",
+              "tertiary-fixed": "#ff9385",
+              "on-surface": "#f9f9fd",
+              "secondary-fixed-dim": "#efc900",
+              "surface-container-high": "#1d2024",
+              "on-secondary-fixed": "#453900",
+              "primary": "#3fff8b"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0c0e11;
+            color: #f9f9fd;
+            font-family: 'Manrope', sans-serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.25rem;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#111417] shadow-[0_20px_40px_rgba(63,255,139,0.06)] flex justify-between items-center px-6 h-16">
+<div class="text-xl font-bold tracking-tighter text-[#3fff8b] uppercase">The Obsidian Lounge</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-8 text-[#f9f9fd]/60 font-['Space_Grotesk'] text-sm uppercase tracking-widest">
+<a class="hover:text-[#3fff8b] transition-colors" href="#">Lobby</a>
+<a class="hover:text-[#3fff8b] transition-colors" href="#">Tables</a>
+<a class="text-[#3fff8b] font-bold" href="#">Profile</a>
+<a class="hover:text-[#3fff8b] transition-colors" href="#">Cashier</a>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#f9f9fd]/60 hover:bg-[#1d2024] p-2 rounded transition-colors cursor-pointer">notifications</span>
+<div class="flex items-center gap-2 bg-[#1d2024] px-4 py-1.5 rounded-sm">
+<span class="material-symbols-outlined text-[#3fff8b] text-lg">account_balance_wallet</span>
+<span class="font-['Space_Grotesk'] font-bold text-[#3fff8b]">$25,430.50</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-[#111417] py-8 z-40">
+<div class="px-8 mt-16 mb-12">
+<div class="w-16 h-16 rounded-full bg-surface-container-highest overflow-hidden mb-4 ring-2 ring-[#ffd709]/20">
+<img alt="High Roller Avatar" class="w-full h-full object-cover" data-alt="Close up portrait of professional poker player" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1DoIs71_o2syffnfnZi1w2Ey7SoNVqgfqx1vttaUYjlVmM7gN0LOiemmzYtmytYH0UtACk_jy3TSQFsmCmaz9KOM-Yx8Wo-a11rCG2x2CAasCwu8zGa8hJ0qtY15fWIX3ohu-keGCRTtICGfE3HISx9hS7s8OX1664fDH9eLjkKOjG1x-5IuLHf2MChKaeLF6GaeZ0Stekm6KzTtUaPl9L6wXUfSwR4pUMPfTIXZ4hWEG8m_rdOkB8CLiUFnhLt4Z7oci-lXXwEY0"/>
+</div>
+<h2 class="font-headline font-extrabold text-xl text-on-surface">Alex G.</h2>
+<p class="font-label text-secondary text-xs uppercase tracking-tighter">Diamond Tier</p>
+</div>
+<nav class="flex flex-col gap-1 px-4">
+<a class="flex items-center gap-4 px-4 py-3 text-[#f9f9fd]/40 hover:text-[#f9f9fd] hover:bg-[#1d2024]/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-[#3fff8b]">grid_view</span>
+<span class="font-label uppercase text-xs tracking-widest">Lobby</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#f9f9fd]/40 hover:text-[#f9f9fd] hover:bg-[#1d2024]/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-[#3fff8b]">playing_cards</span>
+<span class="font-label uppercase text-xs tracking-widest">Tables</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 bg-[#1d2024] text-[#3fff8b] border-r-2 border-[#3fff8b] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label uppercase text-xs tracking-widest">Profile</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-[#f9f9fd]/40 hover:text-[#f9f9fd] hover:bg-[#1d2024]/50 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:text-[#3fff8b]">payments</span>
+<span class="font-label uppercase text-xs tracking-widest">Cashier</span>
+</a>
+</nav>
+<div class="mt-auto px-4">
+<button class="w-full py-4 bg-primary text-on-primary font-bold uppercase text-xs tracking-tighter rounded-sm hover:opacity-90 active:scale-95 transition-all">
+                Quick Seat
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-32 px-6 md:px-12 max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="mb-12">
+<h1 class="font-headline font-black text-5xl md:text-7xl -tracking-[0.04em] text-on-surface mb-2">DASHBOARD</h1>
+<div class="h-1 w-24 bg-primary"></div>
+</header>
+<!-- Bento Grid Statistics -->
+<section class="bento-grid mb-12">
+<!-- Key Stats -->
+<div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+<div class="bg-surface-container-low p-8 flex flex-col justify-between aspect-video md:aspect-auto">
+<span class="font-label text-xs uppercase text-on-surface-variant tracking-[0.2em]">Win Rate</span>
+<div class="flex items-baseline gap-2 mt-4">
+<span class="font-label text-5xl font-bold text-primary">64.2</span>
+<span class="font-label text-xl text-primary/60">%</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-primary-dim">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="text-xs font-label">+2.4% this month</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-8 flex flex-col justify-between">
+<span class="font-label text-xs uppercase text-on-surface-variant tracking-[0.2em]">Total Earnings</span>
+<div class="flex items-baseline gap-2 mt-4">
+<span class="font-label text-5xl font-bold text-on-surface">1.2M</span>
+<span class="font-label text-xl text-on-surface-variant">USD</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-label">All-time High Roller</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-8 flex flex-col justify-between">
+<span class="font-label text-xs uppercase text-on-surface-variant tracking-[0.2em]">Hands Played</span>
+<div class="flex items-baseline gap-2 mt-4">
+<span class="font-label text-5xl font-bold text-on-surface">142k</span>
+</div>
+<div class="mt-4 flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">timer</span>
+<span class="text-xs font-label">Avg 4.2h / session</span>
+</div>
+</div>
+</div>
+<!-- Achievement Badges Card -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-high p-8 flex flex-col">
+<div class="flex justify-between items-center mb-8">
+<span class="font-label text-xs uppercase text-on-surface-variant tracking-[0.2em]">Achievements</span>
+<span class="material-symbols-outlined text-secondary">workspace_premium</span>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="aspect-square bg-surface-container-highest flex items-center justify-center rounded-sm group cursor-help relative" title="Diamond Tier Member">
+<span class="material-symbols-outlined text-3xl text-secondary" style="font-variation-settings: 'FILL' 1;">diamond</span>
+</div>
+<div class="aspect-square bg-surface-container-highest flex items-center justify-center rounded-sm cursor-help" title="Royal Flush Executed">
+<span class="material-symbols-outlined text-3xl text-primary" style="font-variation-settings: 'FILL' 1;">playing_cards</span>
+</div>
+<div class="aspect-square bg-surface-container-highest flex items-center justify-center rounded-sm cursor-help" title="Tournament Winner">
+<span class="material-symbols-outlined text-3xl text-tertiary" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+</div>
+<div class="aspect-square bg-surface-container-highest flex items-center justify-center rounded-sm opacity-20 border border-dashed border-outline">
+<span class="material-symbols-outlined text-3xl">lock</span>
+</div>
+<div class="aspect-square bg-surface-container-highest flex items-center justify-center rounded-sm opacity-20 border border-dashed border-outline">
+<span class="material-symbols-outlined text-3xl">lock</span>
+</div>
+<div class="aspect-square bg-surface-container-highest flex items-center justify-center rounded-sm opacity-20 border border-dashed border-outline">
+<span class="material-symbols-outlined text-3xl">lock</span>
+</div>
+</div>
+<button class="mt-auto pt-6 text-xs font-label uppercase text-primary text-center hover:underline tracking-widest">View All 42 Badges</button>
+</div>
+</section>
+<!-- Tournament History & Profile Settings -->
+<section class="grid grid-cols-12 gap-8">
+<!-- Recent History -->
+<div class="col-span-12 lg:col-span-7">
+<div class="flex justify-between items-end mb-6">
+<h3 class="font-headline font-bold text-2xl">Recent Activity</h3>
+<span class="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">Last 30 Days</span>
+</div>
+<div class="space-y-4">
+<!-- History Item -->
+<div class="bg-surface-container-low hover:bg-surface-container-high transition-colors p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">emoji_events</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg">Obsidian Masters #42</h4>
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Multi-Table Tournament • Dec 14</p>
+</div>
+</div>
+<div class="flex items-center gap-12 md:text-right">
+<div class="hidden sm:block">
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Rank</p>
+<p class="font-headline font-extrabold text-secondary">1st / 420</p>
+</div>
+<div>
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Payout</p>
+<p class="font-label font-bold text-primary">+$12,450.00</p>
+</div>
+</div>
+</div>
+<!-- History Item -->
+<div class="bg-surface-container-low hover:bg-surface-container-high transition-colors p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">history</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg">High Stakes Cash 5/10</h4>
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Cash Game • Dec 12</p>
+</div>
+</div>
+<div class="flex items-center gap-12 md:text-right">
+<div class="hidden sm:block">
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Duration</p>
+<p class="font-headline font-extrabold text-on-surface">3h 45m</p>
+</div>
+<div>
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Net Result</p>
+<p class="font-label font-bold text-tertiary">-$1,200.00</p>
+</div>
+</div>
+</div>
+<!-- History Item -->
+<div class="bg-surface-container-low hover:bg-surface-container-high transition-colors p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">military_tech</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg">Sunday Million Qualifier</h4>
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Satellite • Dec 10</p>
+</div>
+</div>
+<div class="flex items-center gap-12 md:text-right">
+<div class="hidden sm:block">
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Rank</p>
+<p class="font-headline font-extrabold text-on-surface">Qualified</p>
+</div>
+<div>
+<p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Ticket Value</p>
+<p class="font-label font-bold text-primary">$1,050.00</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Profile Settings -->
+<div class="col-span-12 lg:col-span-5">
+<h3 class="font-headline font-bold text-2xl mb-6">Profile Settings</h3>
+<div class="bg-surface-container-high p-8 space-y-8">
+<div>
+<label class="block font-label text-[10px] uppercase text-on-surface-variant tracking-[0.2em] mb-4">Avatar Customization</label>
+<div class="flex flex-wrap gap-4">
+<div class="w-14 h-14 rounded-full ring-2 ring-primary bg-surface-container-lowest overflow-hidden cursor-pointer p-0.5">
+<img alt="Option 1" class="w-full h-full object-cover rounded-full" data-alt="Default player avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPZcZdKP-TO6uanP7XDgDzJtGSfObpO6aGxjkr6e9eEEo_yMT-3QSX3yF1CkjWEYUtiv7t5yLmjKRumCMjoDlWx0OVDV0Ph05ArQXMOX6Lgd-XTtnVrHdSrxyYxfJ1QnFyoLLnolE1eoRmn8UxxYwZqh74iV5p0JLDi-ut8f8sdbW-zMVsp6JnfokIZZ1d-G4V6JcKyPrBG6Yx46xUEDLv28wCv2VPC2BcuvfV4dvpcZjAru13nCiiY5pvpSwNfzsOIaf-ZRUYZ-Ls"/>
+</div>
+<div class="w-14 h-14 rounded-full bg-surface-container-lowest overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/40 transition-all">
+<img alt="Option 2" class="w-full h-full object-cover opacity-50 hover:opacity-100" data-alt="Alternative player avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZA1XPpo8yG_S7cPLzygaxgeLpNFT3h01euQnPebRmTLJbmfC-booMHzc7PQiDTP0w-jagsWfnXIINAQrP_ZLfv7fLRs-Xz3lviExjD5GJSQ6RoGHx355w1Gmc43piVG4AVtQAsBxoSc0n9fVq1OYHXA4KVjCwMVMr6oq4okOvgqI0sM0kPFWh7JSiiBEKlKJyA4GCD5gxcoFLGNl4pHwrskrHUMcGh7g_UXU89-BLXpoQGv09M0UJ39P-TqXlG0yqBoRo-gAMqZA4"/>
+</div>
+<div class="w-14 h-14 rounded-full bg-surface-container-lowest overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/40 transition-all">
+<img alt="Option 3" class="w-full h-full object-cover opacity-50 hover:opacity-100" data-alt="Third alternative player avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRfeHMWt2C9rZF-yxbk_HBwgYrKQN28Ihqlp4gu8-HzfYfzMtWGi686yaQHMyzKLpa-VsVCuZYm5nXIIbwX0LnibzKykVhsufLbpBZYg4q4Qae9-hO3DGZCMOXooAMpfNeNR-WP_4gf-fTqNUQ5VHw2NemL5j8G0_lsg876vEOCea1GCQjYsaOhLvDNlh1uAKoYoNIyl-OgQrLhIfA3ohxm0vaoLGoD_Bdh9TcnjctC0RamR0WbkoxWv8YiCvhDggcXGIBkisGmv2_"/>
+</div>
+<div class="w-14 h-14 rounded-full bg-surface-container-lowest overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/40 transition-all">
+<img alt="Option 4" class="w-full h-full object-cover opacity-50 hover:opacity-100" data-alt="Fourth alternative player avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGNTCZAyesTr6t4m9pAUowcXi7TIXG_1AsWguHX1b1ytgbWXuyqwBjYp527K_Ao_2bkw9P2i_kwEHAeHP90H-fOg_ibzD2TiJQKJ4pTomhOBuBxbuq08GRWqqTpBl1hyOEBobl2wvzw3FD-Gvye_DNTmxdlYYF_w9UqXW6IKzOEp30SC06H_UFfOweYecRKfoVNwNutfd0Dxd5a-jGTrpiik7vcVaI1SuF3EdNXeQDUViI9pnFyt9eaQ1fHFTfu4n3jD7jjDWnAhb2"/>
+</div>
+<button class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant border border-dashed border-outline-variant hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined">add_a_photo</span>
+</button>
+</div>
+</div>
+<div class="space-y-4">
+<div class="group">
+<label class="block font-label text-[10px] uppercase text-on-surface-variant tracking-[0.2em] mb-2">Display Name</label>
+<input class="w-full bg-surface-container-highest border-none text-on-surface font-label focus:ring-1 focus:ring-primary/40 py-3 px-4 transition-all" type="text" value="Alex G."/>
+</div>
+<div class="group">
+<label class="block font-label text-[10px] uppercase text-on-surface-variant tracking-[0.2em] mb-2">Primary Currency</label>
+<select class="w-full bg-surface-container-highest border-none text-on-surface font-label focus:ring-1 focus:ring-primary/40 py-3 px-4 transition-all">
+<option>USD - United States Dollar</option>
+<option>EUR - Euro</option>
+<option>GBP - British Pound</option>
+</select>
+</div>
+</div>
+<div class="pt-4 flex flex-col gap-3">
+<button class="w-full py-4 bg-primary text-on-primary font-bold uppercase text-xs tracking-widest rounded-sm hover:opacity-90 transition-all">
+                            Save Changes
+                        </button>
+<button class="w-full py-4 bg-surface-container-highest text-on-surface font-bold uppercase text-xs tracking-widest border border-outline-variant/20 hover:bg-surface-bright transition-all">
+                            Security Settings
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-20 pb-safe px-4 bg-[#0c0e11]/95 backdrop-blur-xl z-50 rounded-t-xl shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center justify-center text-[#f9f9fd]/40" href="#">
+<span class="material-symbols-outlined">style</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest mt-1">Lobby</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#f9f9fd]/40" href="#">
+<span class="material-symbols-outlined">casino</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest mt-1">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#3fff8b] scale-110" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest mt-1 font-bold">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#f9f9fd]/40" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase tracking-widest mt-1">Cashier</span>
+</a>
+</nav>
+<!-- Decorative Smoked Glass Background Element -->
+<div class="fixed top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
+<div class="fixed bottom-0 left-0 -z-10 w-[400px] h-[400px] bg-secondary/5 blur-[100px] rounded-full pointer-events-none"></div>
+</body></html>

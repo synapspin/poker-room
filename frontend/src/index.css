@@ -1,45 +1,110 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import "tailwindcss";
+
+@theme {
+  /* The Obsidian Lounge — Color Palette */
+  --color-primary: #3fff8b;
+  --color-primary-dim: #24f07e;
+  --color-primary-container: #13ea79;
+  --color-on-primary: #005d2c;
+  --color-on-primary-container: #004f24;
+  --color-inverse-primary: #006e35;
+
+  --color-secondary: #ffd709;
+  --color-secondary-dim: #efc900;
+  --color-secondary-container: #705d00;
+  --color-on-secondary: #5b4b00;
+  --color-on-secondary-container: #fff7e6;
+
+  --color-tertiary: #ff7162;
+  --color-tertiary-dim: #e2241f;
+  --color-tertiary-container: #f9362c;
+  --color-on-tertiary: #4a0001;
+
+  --color-error: #ff716c;
+  --color-error-dim: #d7383b;
+  --color-error-container: #9f0519;
+  --color-on-error: #490006;
+  --color-on-error-container: #ffa8a3;
+
+  --color-surface: #0c0e11;
+  --color-surface-dim: #0c0e11;
+  --color-surface-bright: #292c31;
+  --color-surface-container-lowest: #000000;
+  --color-surface-container-low: #111417;
+  --color-surface-container: #171a1d;
+  --color-surface-container-high: #1d2024;
+  --color-surface-container-highest: #23262a;
+  --color-surface-tint: #3fff8b;
+  --color-surface-variant: #23262a;
+
+  --color-on-surface: #f9f9fd;
+  --color-on-surface-variant: #aaabaf;
+  --color-inverse-surface: #f9f9fd;
+  --color-inverse-on-surface: #535559;
+
+  --color-outline: #747579;
+  --color-outline-variant: #46484b;
+
+  --color-background: #0c0e11;
+  --color-on-background: #f9f9fd;
+
+  /* Font families */
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Space Grotesk", monospace;
+
+  /* Border radius */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
 }
 
+/* Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Custom utility classes */
+.poker-table-gradient {
+  background: radial-gradient(circle at center, #13ea7920 0%, #0c0e11 70%);
+}
+
+.glass-panel {
+  backdrop-filter: blur(16px);
+  background: rgba(35, 38, 42, 0.6);
+}
+
+.ambient-shadow {
+  box-shadow: 0 20px 40px rgba(63, 255, 139, 0.06);
+}
+
+.ghost-border {
+  border: 1px solid rgba(70, 72, 75, 0.15);
+}
+
+/* Scrollbar hiding */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Animations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(63, 255, 139, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(63, 255, 139, 0.6); }
+}
+
+/* Base styles */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #1a1a2e;
-  color: #eee;
-  min-height: 100vh;
+  background-color: #0c0e11;
+  color: #f9f9fd;
+  font-family: "Manrope", sans-serif;
 }
 
-button {
-  cursor: pointer;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  transition: opacity 0.2s;
-}
-
-button:hover {
-  opacity: 0.85;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-input {
-  padding: 8px 12px;
-  border: 1px solid #444;
-  border-radius: 6px;
-  background: #16213e;
-  color: #eee;
-  font-size: 14px;
-  outline: none;
-}
-
-input:focus {
-  border-color: #e94560;
+::selection {
+  background-color: #13ea79;
+  color: #004f24;
 }

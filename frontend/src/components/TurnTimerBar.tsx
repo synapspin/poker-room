@@ -11,10 +11,8 @@ export function TurnTimerBar({ timer }: TurnTimerBarProps) {
   useEffect(() => {
     const update = () => {
       const elapsed = Date.now() - timer.startedAt;
-      const left = Math.max(0, timer.duration - elapsed);
-      setRemaining(left);
+      setRemaining(Math.max(0, timer.duration - elapsed));
     };
-
     update();
     const interval = setInterval(update, 100);
     return () => clearInterval(interval);
@@ -23,26 +21,18 @@ export function TurnTimerBar({ timer }: TurnTimerBarProps) {
   const fraction = remaining / timer.duration;
   const seconds = Math.ceil(remaining / 1000);
 
-  const color = fraction > 0.5 ? '#4ecca3' : fraction > 0.2 ? '#f0a500' : '#e94560';
+  const barColor = fraction > 0.5 ? 'bg-primary' : fraction > 0.2 ? 'bg-secondary' : 'bg-error';
+  const textColor = fraction > 0.5 ? 'text-primary' : fraction > 0.2 ? 'text-secondary' : 'text-error';
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <div style={{
-        flex: 1,
-        height: 4,
-        background: '#333',
-        borderRadius: 2,
-        overflow: 'hidden',
-      }}>
-        <div style={{
-          width: `${fraction * 100}%`,
-          height: '100%',
-          background: color,
-          borderRadius: 2,
-          transition: 'width 0.1s linear',
-        }} />
+    <div className="flex items-center gap-1.5">
+      <div className="flex-1 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+        <div
+          className={`h-full ${barColor} rounded-full transition-all duration-100 ease-linear`}
+          style={{ width: `${fraction * 100}%` }}
+        />
       </div>
-      <span style={{ fontSize: 11, color, fontWeight: 700, minWidth: 24, textAlign: 'right' }}>
+      <span className={`font-label text-[9px] font-bold ${textColor} min-w-[18px] text-right`}>
         {seconds}s
       </span>
     </div>

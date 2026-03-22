@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Obsidian Lounge - High Stakes Table</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-on-surface": "#535559",
+                        "on-primary": "#005d2c",
+                        "secondary-fixed": "#ffd709",
+                        "primary-dim": "#24f07e",
+                        "primary-fixed-dim": "#24f07e",
+                        "background": "#0c0e11",
+                        "primary-container": "#13ea79",
+                        "on-secondary-container": "#fff7e6",
+                        "surface-container": "#171a1d",
+                        "tertiary": "#ff7162",
+                        "on-secondary": "#5b4b00",
+                        "error-dim": "#d7383b",
+                        "tertiary-container": "#f9362c",
+                        "surface-variant": "#23262a",
+                        "tertiary-dim": "#e2241f",
+                        "on-tertiary-container": "#000000",
+                        "surface-tint": "#3fff8b",
+                        "surface-dim": "#0c0e11",
+                        "surface-container-lowest": "#000000",
+                        "error": "#ff716c",
+                        "surface-container-low": "#111417",
+                        "on-primary-fixed-variant": "#006832",
+                        "on-primary-fixed": "#004820",
+                        "on-tertiary-fixed": "#3a0001",
+                        "secondary": "#ffd709",
+                        "on-primary-container": "#004f24",
+                        "outline-variant": "#46484b",
+                        "surface-bright": "#292c31",
+                        "on-surface-variant": "#aaabaf",
+                        "on-error": "#490006",
+                        "error-container": "#9f0519",
+                        "outline": "#747579",
+                        "surface": "#0c0e11",
+                        "surface-container-highest": "#23262a",
+                        "on-background": "#f9f9fd",
+                        "inverse-surface": "#f9f9fd",
+                        "primary-fixed": "#3fff8b",
+                        "on-error-container": "#ffa8a3",
+                        "tertiary-fixed-dim": "#ff7c6c",
+                        "secondary-dim": "#efc900",
+                        "on-secondary-fixed-variant": "#665500",
+                        "secondary-container": "#705d00",
+                        "on-tertiary": "#4a0001",
+                        "on-tertiary-fixed-variant": "#7a0004",
+                        "inverse-primary": "#006e35",
+                        "tertiary-fixed": "#ff9385",
+                        "on-surface": "#f9f9fd",
+                        "secondary-fixed-dim": "#efc900",
+                        "surface-container-high": "#1d2024",
+                        "on-secondary-fixed": "#453900",
+                        "primary": "#3fff8b"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .poker-table-gradient {
+            background: radial-gradient(circle at center, #13ea7920 0%, #0c0e11 70%);
+        }
+        .glass-panel {
+            backdrop-filter: blur(16px);
+            background: rgba(35, 38, 42, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar Implementation -->
+<header class="fixed top-0 w-full z-50 bg-[#111417] shadow-[0_20px_40px_rgba(63,255,139,0.06)] flex justify-between items-center px-6 h-16">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-tighter text-[#3fff8b] uppercase font-headline">The Obsidian Lounge</span>
+<div class="h-4 w-[1px] bg-outline-variant/30"></div>
+<span class="font-label text-xs tracking-widest text-on-surface-variant uppercase">Table #402 • High Stakes</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3 bg-surface-container-highest px-4 py-1.5 rounded-full border border-outline-variant/10">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-label font-bold text-sm">$25,430.50</span>
+</div>
+<div class="flex gap-4">
+<button class="text-on-surface/60 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="VIP Player Profile" class="w-full h-full object-cover" data-alt="Close up of a premium 3D avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3pSBX7xQku2RZIzpnQdOMZwNT2CoNjgiGrarNqGNAplZMRJa8A4bEL2lQX-C1XqWJJeMRWybO9YKuTHcwtkicZEHC9pRlf3OuvlLLUpVYt-YF13UWq1uE9XdIlEAcLo3RUmj3cVKCxs_20q9GX2-vAsfvyu2WmWQM3gPsmxxNRnFfabPe3fRuSTvKUiM1o4J6hCBTICHxSrg4pnkr1HxtTkgKkBD64JrGLynoQonhpykA-Yf-gDip4WyH9rc5PBgtOMlm4yiDN420"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 flex mt-16 relative overflow-hidden">
+<!-- SideNavBar - Suppressed for focus journey, replaced with Table Layout -->
+<!-- Game Canvas -->
+<div class="flex-1 flex flex-col relative poker-table-gradient items-center justify-center p-8">
+<!-- The Poker Table -->
+<div class="relative w-full max-w-5xl aspect-[21/10] bg-surface-container-low rounded-[200px] border-[12px] border-surface-container-highest shadow-2xl flex items-center justify-center overflow-hidden">
+<!-- Inner Felt -->
+<div class="absolute inset-4 rounded-[180px] border border-primary/10 bg-[#0c2a1a] shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]"></div>
+<!-- Community Cards -->
+<div class="relative z-10 flex flex-col items-center gap-6">
+<div class="text-on-surface-variant/40 font-label text-[10px] tracking-[0.4em] uppercase">The Pot: $12,850</div>
+<div class="flex gap-3">
+<!-- Flop -->
+<div class="w-16 h-24 bg-inverse-surface rounded-lg flex flex-col p-2 text-surface shadow-xl">
+<span class="font-label font-bold text-lg leading-none">A</span>
+<span class="material-symbols-outlined text-tertiary text-xl" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="w-16 h-24 bg-inverse-surface rounded-lg flex flex-col p-2 text-surface shadow-xl">
+<span class="font-label font-bold text-lg leading-none">K</span>
+<span class="material-symbols-outlined text-tertiary text-xl" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="w-16 h-24 bg-inverse-surface rounded-lg flex flex-col p-2 text-surface shadow-xl">
+<span class="font-label font-bold text-lg leading-none">10</span>
+<span class="material-symbols-outlined text-surface-container-lowest text-xl" data-icon="stat_0" style="font-variation-settings: 'FILL' 1;">stat_0</span>
+</div>
+<!-- Turn -->
+<div class="w-16 h-24 bg-inverse-surface rounded-lg flex flex-col p-2 text-surface shadow-xl">
+<span class="font-label font-bold text-lg leading-none">J</span>
+<span class="material-symbols-outlined text-tertiary text-xl" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<!-- River -->
+<div class="w-16 h-24 bg-surface-container-highest/40 border border-on-surface/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface/20 text-3xl" data-icon="style">style</span>
+</div>
+</div>
+</div>
+<!-- Players Positioning -->
+<!-- Player 1: Top Center -->
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant bg-surface-container-highest overflow-hidden">
+<img alt="Player" class="w-full h-full" data-alt="Abstract player avatar icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5l9xRfKZf3wsux5QAJMXIQeaa3W8_cdH9tkNjZBDv7FjNa4Xh-aXTRYa-KnDOtUDK659EEisfbg3bOyQgvNmlnfH37ofxz6fEO4A0QMBFmSAqS-wthXWR-wvdnSEEQmx4iy7rIiouN0zYV5SMNUMlYA_7mPlTfill_YogPpIE9Ll5ocm7yBeSPaO0npJY4EciXzwYiptmf1mrN6NrgdMVvYncAUmE9IRa6JpJccLI4nSkimd0ocSZu-XHC9FaQza_1ebXaxEGnF9M"/>
+</div>
+<div class="bg-surface-container-highest/80 backdrop-blur px-3 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-wider">Marcus V.</div>
+<div class="text-primary font-label text-xs">$45,000</div>
+</div>
+<!-- Player 2: Right -->
+<div class="absolute top-1/2 -right-4 -translate-y-1/2 flex flex-col items-center gap-2">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant bg-surface-container-highest overflow-hidden">
+<img alt="Player" class="w-full h-full" data-alt="Abstract player avatar icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbxRPo2ub0pyCv22sNxgTQIEJ_LfbtzY4r4K5Fckhkh8U5WZf9DkRCFLiM42phr4eJ4IMkLAMlJwUq-I7f16GapKrA-YAAj5VszHRBx_LJ0qG2aRq-q_fRSgdiCHYOHBSUY6qhQL0rKYRRJNkp9WfsvFoOrxVXpiupwiGYGs9WLeoybweyjpXwcWHDc0x0UeH7SJ2pcIKCjogTPE1C1R5paN_xPE5e60Dkt-cxvy75pVh0W7mq3SuSzv7Trh1gAC4_JIsPiQISYJyZ"/>
+</div>
+<div class="bg-surface-container-highest/80 backdrop-blur px-3 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-wider">Elena R.</div>
+<div class="text-primary font-label text-xs">$12,200</div>
+</div>
+<!-- Player 3: Bottom Right -->
+<div class="absolute bottom-4 right-20 flex flex-col items-center gap-2">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant bg-surface-container-highest overflow-hidden">
+<img alt="Player" class="w-full h-full" data-alt="Abstract player avatar icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-4vzme53eEFjmc-TgbSrNWjnqzMbikC43y7kQVAXCxWRrZQy1TEJkoV7AQMCza6NrlxGCKvuVDmFhEzWEG_MIBlom3-XM0jZxxn_Snd_2x1YlO2Iv9vxf7X9CYFrfi8o_HGeHu1OALPvlMsMA1ca0pN1paHj55RV7oWzAYhcdOoN3_m6GtohYcDTy9PNAn_zPd_0J23B30W2K5FVBDfBJntpQz2R01dJ-9wcnK8s0wqWEYxCjjduEl8YQmf6SYu7t7LHeuFOgPZDF"/>
+</div>
+<div class="bg-surface-container-highest/80 backdrop-blur px-3 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-wider">Dmitri</div>
+<div class="text-primary font-label text-xs">$8,430</div>
+</div>
+<!-- Player 4: YOUR SEAT (Active Highlight) -->
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
+<div class="relative">
+<div class="w-20 h-20 rounded-full border-4 border-primary shadow-[0_0_30px_rgba(63,255,139,0.4)] bg-surface-container-highest overflow-hidden">
+<img alt="Alex G." class="w-full h-full" data-alt="Player avatar close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv61HGYSFQ-It5qXlxKmRSdnFyG-_Bg0NK5F4Zn0SgxfxdXT60HhKa-ppEaGX_rhNxI-hi-RRKiSVjLfLd9zT-tSOhMxzwy3SBVbkn2JNpvOtREXE_iJRecpe22oIPv_ZuRCiEjYpIRMRIsePYQp_PI9wxxBHhGWx9yFJ9aR123IqfDBCXEMvuvrVHOuN9WyvFoWUm0qcd80fszFJ3mNO6KdMlAVZIWs15nhuhBD59mA_r76SZkv7pLp92cpsGFJAu9dphd0GjcHnU"/>
+</div>
+<div class="absolute -top-2 -right-2 bg-secondary text-on-secondary px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter">Diamond</div>
+</div>
+<div class="bg-primary text-on-primary px-4 py-1 rounded font-headline font-extrabold text-xs uppercase tracking-widest">Your Turn</div>
+</div>
+<!-- Player 5: Left -->
+<div class="absolute top-1/2 -left-4 -translate-y-1/2 flex flex-col items-center gap-2">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant bg-surface-container-highest overflow-hidden">
+<img alt="Player" class="w-full h-full" data-alt="Abstract player avatar icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_JHLBlcbLNUASvff95XqGWxfETLy9t_Cgvq1vZpPlpJYpclnIiM6vzycKhjmt_G_X3QXy3BsT_QmZ5CPzzgsMp9oL2lj6-Flbd_mEfmftmDvRiGv7WTUnZo_n3Xbcv9-A5eDarRRXIahAMmTbtJBVAvgowLVYWBt5RGorFgqDrJAa_HFOhHi7kX7K2ErxOHOyl2BOKPCQSuh6C3FUdQPN_khGp5J_8fS2aWHeS64NmnPxLr4HwfLxbkScmSaRUJrLTkyb6M_OQ8Dw"/>
+</div>
+<div class="bg-surface-container-highest/80 backdrop-blur px-3 py-1 rounded-full text-[10px] font-label font-bold uppercase tracking-wider">Sarah J.</div>
+<div class="text-primary font-label text-xs">$22,150</div>
+</div>
+<!-- Dealer Button -->
+<div class="absolute top-[35%] right-[25%] w-8 h-8 rounded-full bg-on-surface text-surface flex items-center justify-center font-black font-label text-[10px] shadow-lg border-2 border-surface-container-highest">D</div>
+</div>
+<!-- Hand Display -->
+<div class="mt-20 flex gap-4">
+<div class="w-24 h-36 bg-inverse-surface rounded-xl flex flex-col p-4 text-surface shadow-2xl transform -rotate-6 translate-x-4 border-2 border-primary/20">
+<span class="font-headline font-extrabold text-3xl leading-none">Q</span>
+<span class="material-symbols-outlined text-tertiary text-4xl mt-2" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="w-24 h-36 bg-inverse-surface rounded-xl flex flex-col p-4 text-surface shadow-2xl transform rotate-3 -translate-x-4 border-2 border-primary/20">
+<span class="font-headline font-extrabold text-3xl leading-none">Q</span>
+<span class="material-symbols-outlined text-surface-container-lowest text-4xl mt-2" data-icon="stat_0" style="font-variation-settings: 'FILL' 1;">stat_0</span>
+</div>
+</div>
+</div>
+<!-- Chat Window Sidebar (Right) -->
+<aside class="w-80 bg-surface-container-low flex flex-col h-full border-l border-outline-variant/5">
+<div class="p-6 border-b border-outline-variant/10">
+<h3 class="font-headline font-bold text-sm tracking-tight uppercase">Table Chat</h3>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4 font-label text-xs">
+<div class="flex flex-col gap-1">
+<span class="text-secondary opacity-80 font-bold">SYSTEM</span>
+<p class="text-on-surface-variant">New round started. Small Blind: $50, Big Blind: $100.</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-primary font-bold">Elena R.</span>
+<p class="text-on-surface/80">Nice hand Marcus.</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-on-surface-variant font-bold">Marcus V.</span>
+<p class="text-on-surface/80">Luck of the draw...</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-tertiary font-bold">Dmitri</span>
+<p class="text-on-surface/80">Going to be a long night.</p>
+</div>
+</div>
+<div class="p-4 bg-surface-container">
+<div class="flex items-center bg-surface-container-highest rounded-lg px-3 py-2">
+<input class="bg-transparent border-none focus:ring-0 text-xs flex-1 text-on-surface placeholder:text-on-surface-variant/40" placeholder="Type a message..." type="text"/>
+<button class="text-primary">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</aside>
+</main>
+<!-- Action Buttons Bar (Fixed Bottom) -->
+<div class="fixed bottom-0 left-0 right-0 h-32 glass-panel z-40 flex items-center justify-center gap-6 px-12">
+<!-- Action Options -->
+<button class="flex-1 max-w-[160px] h-16 rounded-sm bg-surface-container-highest hover:bg-surface-bright transition-all flex flex-col items-center justify-center gap-1 group">
+<span class="font-headline font-bold text-sm uppercase tracking-widest text-on-surface/60 group-hover:text-tertiary transition-colors">Fold</span>
+<span class="font-label text-[10px] text-on-surface-variant/40">Give up hand</span>
+</button>
+<button class="flex-1 max-w-[160px] h-16 rounded-sm bg-surface-container-highest hover:bg-surface-bright border border-outline-variant/20 transition-all flex flex-col items-center justify-center gap-1">
+<span class="font-headline font-bold text-sm uppercase tracking-widest text-on-surface">Check</span>
+<span class="font-label text-[10px] text-on-surface-variant/40">Stay in game</span>
+</button>
+<div class="flex-1 max-w-[400px] flex gap-2">
+<button class="flex-[2] h-16 rounded-sm bg-primary hover:bg-primary-container transition-all flex flex-col items-center justify-center gap-1 active:scale-95 shadow-[0_0_40px_rgba(63,255,139,0.2)]">
+<span class="font-headline font-bold text-sm uppercase tracking-widest text-on-primary">Call $200</span>
+<span class="font-label text-[10px] text-on-primary/60">Match current bet</span>
+</button>
+<div class="flex-1 flex flex-col gap-2">
+<button class="h-16 rounded-sm bg-secondary hover:bg-secondary-fixed transition-all flex flex-col items-center justify-center gap-1">
+<span class="font-headline font-bold text-sm uppercase tracking-widest text-on-secondary">Raise</span>
+<span class="font-label text-[10px] text-on-secondary/60">Increase stakes</span>
+</button>
+</div>
+</div>
+<div class="w-48 flex flex-col gap-2">
+<div class="flex justify-between text-[10px] font-label text-on-surface-variant/60 uppercase">
+<span>Bet Amount</span>
+<span class="text-primary">$500</span>
+</div>
+<input class="w-full accent-primary bg-surface-container-highest h-1 rounded-full appearance-none" type="range"/>
+<div class="flex justify-between gap-1">
+<button class="flex-1 py-1 rounded-sm bg-surface-container-highest text-[10px] font-label uppercase hover:text-primary">Min</button>
+<button class="flex-1 py-1 rounded-sm bg-surface-container-highest text-[10px] font-label uppercase hover:text-primary">1/2 Pot</button>
+<button class="flex-1 py-1 rounded-sm bg-surface-container-highest text-[10px] font-label uppercase hover:text-primary">Max</button>
+</div>
+</div>
+</div>
+</body></html>

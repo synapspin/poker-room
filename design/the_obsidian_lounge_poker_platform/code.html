@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#535559",
+              "on-primary": "#005d2c",
+              "secondary-fixed": "#ffd709",
+              "primary-dim": "#24f07e",
+              "primary-fixed-dim": "#24f07e",
+              "background": "#0c0e11",
+              "primary-container": "#13ea79",
+              "on-secondary-container": "#fff7e6",
+              "surface-container": "#171a1d",
+              "tertiary": "#ff7162",
+              "on-secondary": "#5b4b00",
+              "error-dim": "#d7383b",
+              "tertiary-container": "#f9362c",
+              "surface-variant": "#23262a",
+              "tertiary-dim": "#e2241f",
+              "on-tertiary-container": "#000000",
+              "surface-tint": "#3fff8b",
+              "surface-dim": "#0c0e11",
+              "surface-container-lowest": "#000000",
+              "error": "#ff716c",
+              "surface-container-low": "#111417",
+              "on-primary-fixed-variant": "#006832",
+              "on-primary-fixed": "#004820",
+              "on-tertiary-fixed": "#3a0001",
+              "secondary": "#ffd709",
+              "on-primary-container": "#004f24",
+              "outline-variant": "#46484b",
+              "surface-bright": "#292c31",
+              "on-surface-variant": "#aaabaf",
+              "on-error": "#490006",
+              "error-container": "#9f0519",
+              "outline": "#747579",
+              "surface": "#0c0e11",
+              "surface-container-highest": "#23262a",
+              "on-background": "#f9f9fd",
+              "inverse-surface": "#f9f9fd",
+              "primary-fixed": "#3fff8b",
+              "on-error-container": "#ffa8a3",
+              "tertiary-fixed-dim": "#ff7c6c",
+              "secondary-dim": "#efc900",
+              "on-secondary-fixed-variant": "#665500",
+              "secondary-container": "#705d00",
+              "on-tertiary": "#4a0001",
+              "on-tertiary-fixed-variant": "#7a0004",
+              "inverse-primary": "#006e35",
+              "tertiary-fixed": "#ff9385",
+              "on-surface": "#f9f9fd",
+              "secondary-fixed-dim": "#efc900",
+              "surface-container-high": "#1d2024",
+              "on-secondary-fixed": "#453900",
+              "primary": "#3fff8b"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-[#111417] shadow-[0_20px_40px_rgba(63,255,139,0.06)] h-16 flex justify-between items-center px-6">
+<div class="text-xl font-bold tracking-tighter text-primary uppercase font-headline">
+            The Obsidian Lounge
+        </div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-4 px-4 py-2 bg-surface-container-highest rounded-lg">
+<span class="text-secondary font-label text-sm font-bold tracking-tight">VIP DIAMOND</span>
+<div class="h-4 w-[1px] bg-outline-variant/30"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
+<span class="font-label font-bold text-on-surface text-sm tracking-widest">$25,430.50</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high transition-colors duration-300 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-surface-container-highest border border-outline-variant/20 overflow-hidden">
+<img alt="VIP Player Profile" class="w-full h-full object-cover" data-alt="Close-up of a stylish poker player avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSsISqb-5SfhPFxsdNBWrG6wlkcZtYeNmQ_iYmtyd3M1r4G46nPkWgvZMDNBU593unPqcMnXLsgd5ecBTcTvQNBMADv-SGh2zbL3BDhtTt0dE-vT5C0Gf-bYT2Xu6cbl_NWGSvSXgFpxRlULGGiExbYWnHu4Gs4sn5qyGAwBEZ64H4ABSPr1vKDV4rO6OxYy8GFrqf7t7JBuMCuRAaX8lux2HQVYgBvG8BLCWOsT743vW04brs71DeZQmd-yFL9-3_9d-dvqaPU1RI"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Side Navigation Bar (Desktop) -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 pt-20 pb-8 bg-surface-container-low z-40">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-1">
+<span class="font-headline font-bold text-on-surface">Alex G.</span>
+<span class="bg-secondary/10 text-secondary text-[10px] px-2 py-0.5 rounded-full font-label font-bold uppercase tracking-wider">Diamond Tier</span>
+</div>
+<p class="text-on-surface-variant text-xs font-label">The High Roller Suite</p>
+</div>
+<div class="flex flex-col gap-1 px-3">
+<a class="flex items-center gap-4 px-4 py-4 bg-surface-container-high text-primary border-r-2 border-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-label text-sm uppercase tracking-widest font-bold">Lobby</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-4 text-on-surface-variant hover:bg-surface-container-high/50 hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">playing_cards</span>
+<span class="font-label text-sm uppercase tracking-widest">Tables</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-4 text-on-surface-variant hover:bg-surface-container-high/50 hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label text-sm uppercase tracking-widest">Profile</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-4 text-on-surface-variant hover:bg-surface-container-high/50 hover:text-on-surface transition-all duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label text-sm uppercase tracking-widest">Cashier</span>
+</a>
+</div>
+<div class="mt-auto px-4">
+<button class="w-full py-4 bg-primary text-on-primary font-headline font-extrabold uppercase tracking-tighter text-sm rounded-sm hover:opacity-90 transition-opacity active:scale-[0.98]">
+                Quick Seat
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-20 pb-24 px-6 md:px-10">
+<!-- Promotional Banner (Bento Style) -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+<div class="lg:col-span-2 relative h-64 rounded-xl overflow-hidden bg-surface-container-highest group">
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/40 to-transparent z-10"></div>
+<img alt="High Stakes Banner" class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:scale-105 transition-transform duration-700" data-alt="Luxurious dark poker table with gold lighting and stacks of chips" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTo7HymggfvEqmuzW4SDkoeWqdRI83yyNSJ0zLT1xsBj7r6R7d7mF0TYcKM8eFlWZNEaZNZhbLoAJAQC5sv6sWd5XBrwdJ9w9KOcKGkeBbWhgw9r5oU5Jcq-5o8j_hKcigdI_9ZQ9CnobgA0Cfd-aVgU7ihSNF6TnoIGlwMDkEyQ1CFKlYKlhPGla8xmAZe9uu52la3EDxhl3EUGIMdjY75xTfXGOEm53VJBCAfT6tQWjdXGRv8QZkPjaeCUqeGFKmtb_hJq_8moWy"/>
+<div class="relative z-20 h-full flex flex-col justify-center p-8">
+<span class="text-secondary font-label text-xs font-bold tracking-[0.3em] uppercase mb-4">World Series Qualifier</span>
+<h1 class="text-4xl md:text-5xl font-headline font-extrabold text-on-surface tracking-tighter leading-none mb-4">
+                        OBSIDIAN <br/>MASTERS 2024
+                    </h1>
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest">Prize Pool</span>
+<span class="text-primary font-label text-xl font-bold">$2,500,000</span>
+</div>
+<button class="px-6 py-2 bg-on-surface text-surface text-xs font-headline font-bold uppercase tracking-widest rounded-sm hover:bg-primary transition-colors">Enter Now</button>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-high rounded-xl p-8 flex flex-col justify-between border border-outline-variant/10">
+<div>
+<span class="text-tertiary font-label text-xs font-bold tracking-[0.2em] uppercase mb-2 block">Live Status</span>
+<h3 class="text-2xl font-headline font-bold text-on-surface leading-tight mb-4">Daily High Roller <br/>Invitational</h3>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-label text-xs">Players Active</span>
+<span class="text-on-surface font-label text-sm">412 / 500</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[82%]"></div>
+</div>
+<button class="w-full py-3 border border-outline-variant/30 text-on-surface font-label text-xs font-bold uppercase tracking-widest hover:bg-surface-container-highest transition-colors">Register</button>
+</div>
+</div>
+</section>
+<!-- Filters Section -->
+<section class="mb-8 flex flex-wrap items-center justify-between gap-6">
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+<button class="px-6 py-2 bg-primary text-on-primary rounded-full text-xs font-label font-bold uppercase tracking-widest">All Games</button>
+<button class="px-6 py-2 bg-surface-container-highest text-on-surface-variant hover:text-on-surface rounded-full text-xs font-label font-bold uppercase tracking-widest transition-colors">Texas Hold'em</button>
+<button class="px-6 py-2 bg-surface-container-highest text-on-surface-variant hover:text-on-surface rounded-full text-xs font-label font-bold uppercase tracking-widest transition-colors">Omaha</button>
+<button class="px-6 py-2 bg-surface-container-highest text-on-surface-variant hover:text-on-surface rounded-full text-xs font-label font-bold uppercase tracking-widest transition-colors">Spin &amp; Go</button>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-surface-container-low p-1 rounded-lg">
+<button class="px-4 py-1.5 bg-surface-container-highest text-on-surface text-[10px] font-label font-bold uppercase tracking-widest rounded-md shadow-lg">Micro</button>
+<button class="px-4 py-1.5 text-on-surface-variant text-[10px] font-label font-bold uppercase tracking-widest">Mid</button>
+<button class="px-4 py-1.5 text-on-surface-variant text-[10px] font-label font-bold uppercase tracking-widest">High</button>
+</div>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">tune</span>
+<span class="text-xs font-label font-bold uppercase tracking-widest">Filters</span>
+</button>
+</div>
+</section>
+<!-- Active Tables Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Table Card 1 -->
+<div class="bg-surface-container-low rounded-xl p-1 group hover:bg-surface-container-high transition-all duration-300">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-on-surface font-headline font-bold text-lg mb-1 tracking-tight">The Diamond Den</h4>
+<p class="text-on-surface-variant font-label text-[10px] uppercase tracking-[0.2em]">NL Texas Hold'em</p>
+</div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-md text-[10px] font-label font-bold border border-primary/20">ACTIVE</span>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Stakes</p>
+<p class="text-on-surface font-label text-sm font-bold">$25 / $50</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Players</p>
+<p class="text-on-surface font-label text-sm font-bold">5 / 9</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Avg Pot</p>
+<p class="text-on-surface font-label text-sm font-bold">$1,240</p>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-8">
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-0 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3ZMmKHa2gTiRBd_2XHftDBUh_XNVJ5ddH-aH2cBnHaN7g_sPcI9NZe3nM3ObG-elfyqC3mjXBb-fOyDQ_662j-vnLYZ3CGod38XlqpsHc2Z0c7divxq9JXoina6wuCpX2t2it5iskcEl8Q8blhFTgINdW06JUy2IEbOcaPGQELbHrBCU2QPWOnmwlNtGmOCLJ62uGEIqasWo_qTr2otxtEKWodM2iMGY9tRhyU2T_8dB_fQQ9pZK6JMIdFd6R1RM3xcOZzt9oJYVe"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPHr8V0vddRBjUlCDx1f9-O5txSzGPDQG4MKJg25W8s9TfDWU14GqVhRwgcJv-AD9k86czz8CQg7_NvmOBIwVegTeB3rOAksl8RDRVXYvLq2_0HcU0I72BECtqzXpN7xGynfqYm8Zi7MmCjKATCG7IAaVt4c_dabyur_5djaVu1Kirg48Lpzb75p8-YNjSa_X-5MGkwdxOYc9AEtmbiWWDRLL5Xv7dJoBlBqQCFrqUG_OWHj44-K6D7-DcPjcTvd-SI669R_4MiW-n"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfyIFN1dsRvx8R-wTwgvdZSx89-oeN8oaGEWhofq3ePMk_txu6KVHLYJMAz4BymPvDO9dBd8FE9kkpJ6tCJ0aY3ksoSBLDLKLlF94X7q_0a7G24gaYUUJkL74X2f7KYzIOFn9ZOrBPU9-lIFpyvpCJp6l5v6mYlJhP1PMG6Bfpzm4UkzWxrmU4paCBAZ1zDYlSAGYfbInUmiSTfNmYUY4zxQ-GJgM9GQBoX88lQuv9JNgsNbFbjyEQQpgujpsljNAR4NdiY_D4840K"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden flex items-center justify-center text-[8px] font-label text-on-surface-variant">+2</div>
+</div>
+<button class="w-full py-3 bg-surface-container-highest text-on-surface font-headline font-bold uppercase tracking-widest text-xs rounded-sm group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">Take a Seat</button>
+</div>
+</div>
+<!-- Table Card 2 -->
+<div class="bg-surface-container-low rounded-xl p-1 group hover:bg-surface-container-high transition-all duration-300">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-on-surface font-headline font-bold text-lg mb-1 tracking-tight">Velvet Vault</h4>
+<p class="text-on-surface-variant font-label text-[10px] uppercase tracking-[0.2em]">Pot Limit Omaha</p>
+</div>
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-md text-[10px] font-label font-bold border border-secondary/20">HIGH ROLLER</span>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Stakes</p>
+<p class="text-on-surface font-label text-sm font-bold">$100 / $200</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Players</p>
+<p class="text-on-surface font-label text-sm font-bold">8 / 9</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Avg Pot</p>
+<p class="text-on-surface font-label text-sm font-bold">$4,850</p>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-8">
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-0 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcqAtD23_NFfTP8AW5Bk6TfRBRxISd99oun8OFev0H_Gio_SpVfTiF5YHlHZqib1_oZtkPZTNGt-1IF5oqNyIFBTCeODeOdgx661_e1Drj2waAs3kkLQkDxKSo5esZXHs1DTaA9wWzxn8eyS6wd8SuoMhdn5omfKbG-QJg7Rgo1wNaN6o0kKYhhJyx8Lgod_g6ymAqJmFFvgWS0uZc4YxM_sJh8qH6Q6wUhqdJ6pLM3LE0EUbpL5D26Oqj0hI1AOKnL2e2i6EG5FKn"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYoaCuL5ufu5KOYoKRnVB6D0VieuHgHQxUh9o9Pk9kMldC0qX9CvEgt4arlED_5EopBZMu1TUIZI9_XggsEDOCOGGCvLNk0Tn0ZLC_iuB0K4SFJynj44WR2GrnFYBwbc_WdsBKnwbFHvX_rfcZkuIXLVc5Wlf0Dpxp137Mk0PVtEm2jl7xCt1JjMxrYeLcvptJyAcyOoLevMf0tF-zuD4Aee_JjN26K0HWs6KWmtQiAxxA8Ei_IaHNHdFtG6VXDHyI5GgwekCNKml9"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0HXV8UxmR2ZDkUQAgieqK-geO356AedKf4i5cZzZGNyCzgOn8-3mjpm0vqNbCzgbfAcwbKCm8yjB2qIlYUfC7xt-cEWVYI60igteMSu1Z3bvfNp6uBM3OCZkbt6TnJU8UGmY8-UHhpHsxZ8VCcmIArgnOl95AxdlB2onX2dOm54Esxycqzx1HT4ua-HWZXh4JhulpLNizBbcPoBRIlQPNVPxqRXs0LAT2qLzmFDdEgjReBfe_1DOHqsRaoCl_kbgPYzJBNKf_x2KN"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden flex items-center justify-center text-[8px] font-label text-on-surface-variant">+5</div>
+</div>
+<button class="w-full py-3 bg-surface-container-highest text-on-surface font-headline font-bold uppercase tracking-widest text-xs rounded-sm group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">Take a Seat</button>
+</div>
+</div>
+<!-- Table Card 3 -->
+<div class="bg-surface-container-low rounded-xl p-1 group hover:bg-surface-container-high transition-all duration-300">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-on-surface font-headline font-bold text-lg mb-1 tracking-tight">Shadow Alley</h4>
+<p class="text-on-surface-variant font-label text-[10px] uppercase tracking-[0.2em]">NL Texas Hold'em</p>
+</div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-md text-[10px] font-label font-bold border border-primary/20">ACTIVE</span>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Stakes</p>
+<p class="text-on-surface font-label text-sm font-bold">$10 / $20</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Players</p>
+<p class="text-on-surface font-label text-sm font-bold">9 / 9</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Avg Pot</p>
+<p class="text-on-surface font-label text-sm font-bold">$312</p>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-8">
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-0 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsZl5WArX9FwX9IaJ7TlXCNEcGX5kELpkcZ88yknfU--SCMiJIn0u1Qn_TEWJpi_kGgEgTLEmMN03Ir8nIdL2sDfIibSjW4h8C4zEoWylIgP-WW9806rDV2pxTLrrmVpT1vcLjJPMN2j6PyDdRcIG6WwqlPcd0V3XITfACYn0JQ1RJ4DOOgfdoC-MnrNcHHNhHivNZVji8k-GhmrgbCQiJ5SGy_cykNwuB-0bUYV54ZoHWOZkmN5LN55fQFNZMVCwpMbMlW5LU6Vym"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEQArgmn1oIzH6-Jv4Vzxn5coGtnxPhszo6wpPEmU_acEAKT1sj0Mx8YPbDNkbClWN5eIw62pA1GyRjzqZMPCvr6SkRFY7pa3ofx6ofaKrgDaRCj1tdIhnhKz8vOPgeBE9Rh7N5CilaY_hmQvuMl4klhv1gcWr2-aS8F5HJ6v1Xk9UftTESXq4Tw_mChcUFVspyzOm4jOmc276E0pUrozi6PnP9nNGDSPw5279E0NqCFTPqJeBRhgjzW5UGpcILd1_HGtEyhkaMKaz"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxn0NoH1Oc6x_3grWO8677NOKuUKqaKEhQZ189o0PWL80rLiGIxzE6nDi0dCbquUZTxSbkWQgsLSH-bSbeQUUBIC0OsF1kg0qIgjWDqpVCfvFcCdjx-Hqh4TFCzMytxn3TqUs777NUdXf1oXGh2A6jaWUf1z2pSnLE9cnaBtI-BC44O0cKtaaTCM8KlD2bLP5brZiNm7f2NloH8u52dJcoTPftUahgTuBFANHKeGlfNDHww4ymKul7xwA0UGRF1gMfpIN9EiAA14Sd"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden flex items-center justify-center text-[8px] font-label text-on-surface-variant">+6</div>
+</div>
+<button class="w-full py-3 bg-surface-container-highest text-on-surface font-headline font-bold uppercase tracking-widest text-xs rounded-sm group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">Wait List</button>
+</div>
+</div>
+<!-- Table Card 4 -->
+<div class="bg-surface-container-low rounded-xl p-1 group hover:bg-surface-container-high transition-all duration-300">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-on-surface font-headline font-bold text-lg mb-1 tracking-tight">Onyx Room</h4>
+<p class="text-on-surface-variant font-label text-[10px] uppercase tracking-[0.2em]">NL Texas Hold'em</p>
+</div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-md text-[10px] font-label font-bold border border-primary/20">ACTIVE</span>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Stakes</p>
+<p class="text-on-surface font-label text-sm font-bold">$5 / $10</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Players</p>
+<p class="text-on-surface font-label text-sm font-bold">2 / 6</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Avg Pot</p>
+<p class="text-on-surface font-label text-sm font-bold">$185</p>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-8">
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-0 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjedDuWOToRETHxSXAszU8fQhZG5z9PQyHy4_CuTg0-3BZ4oCpcVpzuOfnLLZkRXuVaX-pD1pDKQsGHgGqmg2HFL-6L4S3E64CW05QBWs_iTMISOrYXpVu67eTr867XENZHYaDeyElfhoPXHxjOxCBdXMCqmZjUpLlLWmTvHH0IRZghRA1Cz7lg0W4B_7lzoqwD7E8h2ZbcXbGIrPiAr0I36LzmQm_ec7_mSlz52IVLgHyIb8j-StQyW-gsZMjV0oshm7pMnelwylo"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuedykRvHV3kTuzhHt-mvZksOIAIqtJaBRADD_BtS15tS4B2Wn0hb1vW112ZYyM0qvO5MqwzuTaVhfsLpsY3i5ysCto7FwC4ZTIIkc1Cqf8jDo7RCJcSY93ZervGcKxwsqrWNdxVR8HEUS_wSxnNNrS5v7P1rQ1RWbMIWgMZxL0m51Iv2nt1MjN1YOkl4bgAE-sj_ataq3Z8HybLwBOc395k4e-T-GSgzrxNosY13FHkQPIfOi-6rWwFiGjX6P1ao6r3NowARndcOl"/></div>
+</div>
+<button class="w-full py-3 bg-surface-container-highest text-on-surface font-headline font-bold uppercase tracking-widest text-xs rounded-sm group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">Take a Seat</button>
+</div>
+</div>
+<!-- Table Card 5 -->
+<div class="bg-surface-container-low rounded-xl p-1 group hover:bg-surface-container-high transition-all duration-300">
+<div class="p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-on-surface font-headline font-bold text-lg mb-1 tracking-tight">Golden Fleece</h4>
+<p class="text-on-surface-variant font-label text-[10px] uppercase tracking-[0.2em]">6-Plus Hold'em</p>
+</div>
+<span class="bg-tertiary/10 text-tertiary px-3 py-1 rounded-md text-[10px] font-label font-bold border border-tertiary/20">FAST ACTION</span>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-8">
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Stakes</p>
+<p class="text-on-surface font-label text-sm font-bold">$25 / $50</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Players</p>
+<p class="text-on-surface font-label text-sm font-bold">4 / 6</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-[9px] uppercase tracking-widest mb-1">Avg Pot</p>
+<p class="text-on-surface font-label text-sm font-bold">$1,890</p>
+</div>
+</div>
+<div class="flex items-center gap-1 mb-8">
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-0 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzcajpVVOlmz4ZsBwCR9DHD3ptHDjqbPsfulRXhrUBRfZifjhqiQhNetKR30HLkJXG-edzHeGhRbz9Pa0MazQ40fLYCr_i6AxuyQkM1S05CgDwRtifvTzl6FY1ZTOPD8OjNedww9U5EBgfQdvgDpUVDJElGKDJdVAG3NRRqhoX5ATsiJ0W_EE_DZ5phh04WQPUtPUYOuO8bjutz3WN2KWWEV5ihuBFkPQbI6DWfy3QmHTJ2SRCcRcvPqPmp9H_p5kKdWVxtZVRbYvU"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9S4-mkRg83yfwXOYQqt4OpIkIozWwdTA9BpfOTxc1IBFTiTQoJ_ZUnpMbYrsB6T3cuaNER0MKsCDPLd-K2lMuh7nYSUmq3A_-Ce--trM8FqFSfvYh4MDEMn99DGr906w3wOMzp32zbsRMsTDKM_BMJz4OwdO74sfVUnbIkSBAqbv4gB0MxSZmTKYxe34SOlI17kmvT2cggaEFaOVOwzajlehsY1aOZ07bDiFufwSjX2R_Yz059Z3l60rQXzw95YE-gdgrqN3GqnIb"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGkFIbTGG7BNxYZ-_BTfBbepWL1W3-l4q3WTEd0lq-dEnl3kTy8dHT-8BkUMakpEX4bzn6HwwULqvT-SZn0SenqYYazQRZ5QCF-e9gAU1vlcubaQtW1Ahah_RQfs2SEOYHjmrdcjH6H9tl11VUqVTHJdJ-vZbePvYW4kOIherH5_25sRfvutmgmMQS1piDdw-AfGC9yOjWxy3-QLdYZCJFdxhN1BraAO8VZOohmZpyhtdrkK132ghjGYxnwymtsRodTIJsoPSl-yxt"/></div>
+<div class="h-6 w-6 rounded-full border border-surface-container-lowest bg-surface-container-highest -ml-2 overflow-hidden"><img alt="Player" data-alt="Poker player avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7fwjzXnmzP8yP1i_eQMtafiY0au6YuMdmSQIiOn9GQUjQt56hYM6jPPQX2isAw7FxJUjKOremLif2wq3_hbm89mGIQXPH-unrZ-_SlS2ctr4-_2z9hJ5aBOpLHmjBwr9q4TJh6k-f7UCkfZmNY31e_qjDzJr2u6Ik97-nMg7w-ONZ_SbC_BeEBQJzBD1eokdhQNrRhJXva0ocP9GDoWhuK6G845kEmdvkZFVy-5Cirw6PtFQdAeeYdl1V-yfa6TYeQGg_jNRDnVZj"/></div>
+</div>
+<button class="w-full py-3 bg-surface-container-highest text-on-surface font-headline font-bold uppercase tracking-widest text-xs rounded-sm group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">Take a Seat</button>
+</div>
+</div>
+<!-- Promotion Card / CTA -->
+<div class="relative rounded-xl p-8 bg-gradient-to-br from-surface-container-highest to-surface-container-high border border-primary/20 flex flex-col items-center justify-center text-center">
+<div class="mb-6">
+<span class="material-symbols-outlined text-5xl text-primary mb-2">stars</span>
+<h4 class="text-on-surface font-headline font-extrabold text-xl tracking-tighter">NEW PRIVATE TABLES</h4>
+</div>
+<p class="text-on-surface-variant font-label text-xs uppercase tracking-widest mb-8 leading-relaxed">Create your own high stakes environment with custom limits and invites.</p>
+<button class="px-8 py-3 bg-primary/10 border border-primary text-primary font-headline font-bold uppercase tracking-widest text-[10px] rounded-sm hover:bg-primary hover:text-on-primary transition-all duration-300">Host Private Game</button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-20 pb-safe px-4 bg-surface-container-low/95 backdrop-blur-xl z-50 border-t border-outline-variant/10">
+<a class="flex flex-col items-center justify-center text-primary scale-110" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-label text-[10px] uppercase tracking-widest mt-1">Lobby</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">playing_cards</span>
+<span class="font-label text-[10px] uppercase tracking-widest mt-1">Tables</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label text-[10px] uppercase tracking-widest mt-1">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label text-[10px] uppercase tracking-widest mt-1">Cashier</span>
+</a>
+</nav>
+</body></html>
