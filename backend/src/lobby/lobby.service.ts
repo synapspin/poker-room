@@ -101,6 +101,10 @@ export class LobbyService {
     }
   }
 
+  listAllGameStates(): GameState[] {
+    return [...this.tables.values()];
+  }
+
   removePlayerFromAllTables(playerId: string): string[] {
     this.removePlayerFromAllWaitlists(playerId);
     const affectedTables: string[] = [];

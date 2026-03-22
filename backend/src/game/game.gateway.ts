@@ -9,6 +9,7 @@ import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
 import { PlayerService } from '../player/player.service';
 import { LobbyService } from '../lobby/lobby.service';
+import { ConnectionService, TURN_TIMER_MS, TURN_TIMER_DISCONNECTED_MS } from '../player/connection.service';
 import { ActionType } from './poker-engine';
 
 @WebSocketGateway({ cors: { origin: '*' } })
@@ -19,11 +20,14 @@ export class GameGateway {
   // Track spectators and previewers per table
   private spectators = new Map<string, Set<string>>(); // tableId → socketIds
   private previewers = new Map<string, Set<string>>(); // tableId → socketIds
+  // Action sequence counters per table for replay validation
+  private actionSeq = new Map<string, number>(); // tableId → sequence number
 
   constructor(
     private gameService: GameService,
     private playerService: PlayerService,
     private lobbyService: LobbyService,
+    private connectionService: ConnectionService,
   ) {}
 
   // --- Spectator / Preview ---
@@ -33,7 +37,6 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { tableId: string },
   ) {
-    // Unsubscribe from previous preview
     for (const [tid, set] of this.previewers) {
       if (set.has(client.id)) {
         set.delete(client.id);
@@ -53,7 +56,6 @@ export class GameGateway {
     this.previewers.get(data.tableId)!.add(client.id);
     client.join(`preview:${data.tableId}`);
 
-    // Send immediate spectator view
     const view = this.gameService.getSpectatorView(state);
     client.emit('game:preview:state', view);
   }
@@ -112,7 +114,7 @@ export class GameGateway {
       return;
     }
 
-    const result = this.lobbyService.addToWaitlist(data.tableId, client.id);
+    const result = this.lobbyService.addToWaitlist(data.tableId, player.userId);
     if (!result) {
       client.emit('error', { message: 'Table not found' });
       return;
@@ -127,9 +129,37 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { tableId: string },
   ) {
-    this.lobbyService.removeFromWaitlist(data.tableId, client.id);
+    const player = this.playerService.get(client.id);
+    if (player) {
+      this.lobbyService.removeFromWaitlist(data.tableId, player.userId);
+    }
     client.emit('game:waitlist:status', { position: 0, total: 0 });
     this.server.emit('lobby:tables', this.lobbyService.listTables());
+  }
+
+  // --- Sit out ---
+
+  @SubscribeMessage('game:sitout')
+  handleSitOut(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { tableId: string },
+  ) {
+    const player = this.playerService.get(client.id);
+    if (!player) return;
+    this.gameService.markPlayerSittingOut(player.userId, true);
+    this.broadcastState(data.tableId);
+  }
+
+  @SubscribeMessage('game:sitback')
+  handleSitBack(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { tableId: string },
+  ) {
+    const player = this.playerService.get(client.id);
+    if (!player) return;
+    this.connectionService.cancelSitOutTimer(player.userId);
+    this.gameService.markPlayerSittingOut(player.userId, false);
+    this.broadcastState(data.tableId);
   }
 
   // --- Core game events ---
@@ -145,7 +175,7 @@ export class GameGateway {
       return;
     }
 
-    const state = this.gameService.joinTable(data.tableId, client.id, player.name, player.chips);
+    const state = this.gameService.joinTable(data.tableId, player.userId, player.name, player.chips);
     if (!state) {
       client.emit('error', { message: 'Cannot join table' });
       return;
@@ -165,11 +195,14 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { tableId: string },
   ) {
-    const state = this.gameService.leaveTable(data.tableId, client.id);
+    const player = this.playerService.get(client.id);
+    if (!player) return;
+
+    const state = this.gameService.leaveTable(data.tableId, player.userId);
     client.leave(data.tableId);
     if (state) {
+      this.connectionService.cancelActionTimer(data.tableId);
       this.broadcastState(data.tableId);
-      // Try to seat someone from waitlist
       this.tryPromoteWaitlist(data.tableId);
     }
     this.server.emit('lobby:tables', this.lobbyService.listTables());
@@ -182,50 +215,246 @@ export class GameGateway {
   ) {
     const state = this.gameService.startGame(data.tableId);
     if (!state) {
-      client.emit('error', { message: 'Cannot start game (need at least 2 players)' });
+      client.emit('error', { message: 'Cannot start game (need at least 2 active players)' });
       return;
     }
     this.broadcastState(data.tableId);
+    this.startTurnTimer(data.tableId);
   }
 
   @SubscribeMessage('game:action')
   handleAction(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { tableId: string; action: ActionType; amount?: number },
+    @MessageBody() data: { tableId: string; action: ActionType; amount?: number; seq?: number },
   ) {
-    const state = this.gameService.processAction(data.tableId, client.id, data.action, data.amount);
-    if (!state) {
-      client.emit('error', { message: 'Invalid action' });
-      return;
+    const player = this.playerService.get(client.id);
+    if (!player) return;
+
+    const result = this.processAndBroadcast(data.tableId, player.userId, data.action, data.amount);
+
+    // Ack with sequence number for replay tracking
+    const currentSeq = this.actionSeq.get(data.tableId) || 0;
+    client.emit('game:action:ack', {
+      seq: data.seq ?? null,
+      serverSeq: currentSeq,
+      success: result.success,
+      reason: result.reason,
+    });
+  }
+
+  @SubscribeMessage('game:action:replay')
+  handleActionReplay(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { tableId: string; actions: { action: ActionType; amount?: number; seq: number; timestamp: number }[] },
+  ) {
+    const player = this.playerService.get(client.id);
+    if (!player) return;
+
+    const results: { seq: number; success: boolean; reason?: string }[] = [];
+
+    for (const entry of data.actions) {
+      // Skip actions older than 60s (stale)
+      if (Date.now() - entry.timestamp > 60_000) {
+        results.push({ seq: entry.seq, success: false, reason: 'expired' });
+        continue;
+      }
+
+      const result = this.processAndBroadcast(data.tableId, player.userId, entry.action, entry.amount);
+      results.push({ seq: entry.seq, success: result.success, reason: result.reason });
+
+      // Stop on first failure — subsequent actions likely invalid
+      if (!result.success) {
+        for (const remaining of data.actions.slice(data.actions.indexOf(entry) + 1)) {
+          results.push({ seq: remaining.seq, success: false, reason: 'skipped_after_failure' });
+        }
+        break;
+      }
     }
 
-    this.broadcastState(data.tableId);
+    client.emit('game:action:replay:result', { results });
+  }
 
-    // If showdown, auto-start new hand after delay
+  private processAndBroadcast(tableId: string, userId: string, action: ActionType, amount?: number): { success: boolean; reason?: string } {
+    const state = this.gameService.processAction(tableId, userId, action, amount);
+    if (!state) {
+      return { success: false, reason: 'invalid_action' };
+    }
+
+    // Increment sequence
+    const seq = (this.actionSeq.get(tableId) || 0) + 1;
+    this.actionSeq.set(tableId, seq);
+
+    this.connectionService.cancelActionTimer(tableId);
+    this.broadcastState(tableId);
+
     if (state.phase === 'showdown') {
-      const playersWithChips = state.players.filter(p => p.chips > 0);
-      if (playersWithChips.length >= 2) {
-        setTimeout(() => {
-          this.gameService.startGame(data.tableId);
-          this.broadcastState(data.tableId);
-        }, 5000);
+      this.handleShowdown(tableId, state);
+    } else if (state.phase !== 'waiting') {
+      this.startTurnTimer(tableId);
+    }
+
+    return { success: true };
+  }
+
+  // --- Turn timer ---
+
+  private startTurnTimer(tableId: string) {
+    const state = this.gameService.getTable(tableId);
+    if (!state || state.phase === 'waiting' || state.phase === 'showdown') return;
+
+    const currentPlayer = state.players[state.currentPlayerIndex];
+    if (!currentPlayer || currentPlayer.folded || currentPlayer.allIn) return;
+
+    const duration = currentPlayer.disconnected ? TURN_TIMER_DISCONNECTED_MS : TURN_TIMER_MS;
+
+    const timerInfo = this.connectionService.startActionTimer(tableId, duration, () => {
+      this.handleTurnTimeout(tableId);
+    });
+
+    // Store timer info in game state for client display
+    state.turnTimer = {
+      playerId: currentPlayer.playerId,
+      startedAt: timerInfo.startedAt,
+      duration: timerInfo.duration,
+    };
+
+    // Re-broadcast with timer info
+    this.broadcastState(tableId);
+  }
+
+  private handleTurnTimeout(tableId: string) {
+    const state = this.gameService.getTable(tableId);
+    if (!state || state.phase === 'waiting' || state.phase === 'showdown') return;
+
+    const currentPlayer = state.players[state.currentPlayerIndex];
+    if (!currentPlayer || currentPlayer.folded || currentPlayer.allIn) return;
+
+    // Auto-action: check if possible, otherwise fold
+    const canCheck = currentPlayer.bet >= state.currentBet;
+    const action: ActionType = canCheck ? 'check' : 'fold';
+
+    console.log(`Turn timeout: ${currentPlayer.name} auto-${action}`);
+
+    const newState = this.gameService.processAction(tableId, currentPlayer.playerId, action);
+    if (!newState) return;
+
+    this.broadcastState(tableId);
+
+    if (newState.phase === 'showdown') {
+      this.handleShowdown(tableId, newState);
+    } else if (newState.phase !== 'waiting') {
+      this.startTurnTimer(tableId);
+    }
+  }
+
+  private handleShowdown(tableId: string, state: any) {
+    const playersWithChips = state.players.filter((p: any) => p.chips > 0 && !p.sittingOut);
+    if (playersWithChips.length >= 2) {
+      setTimeout(() => {
+        const newState = this.gameService.startGame(tableId);
+        if (newState) {
+          this.broadcastState(tableId);
+          this.startTurnTimer(tableId);
+        }
+      }, 5000);
+    }
+  }
+
+  // --- Disconnect / Reconnect support ---
+
+  handlePlayerDisconnect(userId: string) {
+    const affectedTables = this.gameService.markPlayerDisconnected(userId, true);
+    for (const tableId of affectedTables) {
+      this.broadcastState(tableId);
+
+      // If it's this player's turn, restart timer with shorter duration
+      const state = this.gameService.getTable(tableId);
+      if (state) {
+        const currentPlayer = state.players[state.currentPlayerIndex];
+        if (currentPlayer && currentPlayer.playerId === userId && state.phase !== 'waiting' && state.phase !== 'showdown') {
+          this.connectionService.cancelActionTimer(tableId);
+          this.startTurnTimer(tableId);
+        }
       }
     }
   }
 
+  handlePlayerReconnect(userId: string, newSocketId: string) {
+    const affectedTables = this.gameService.markPlayerDisconnected(userId, false);
+
+    // Rejoin socket rooms
+    const socket = this.server.sockets.sockets.get(newSocketId);
+    if (socket) {
+      for (const tableId of affectedTables) {
+        socket.join(tableId);
+      }
+    }
+
+    for (const tableId of affectedTables) {
+      this.broadcastState(tableId);
+
+      // If it's now this player's turn and they were on shorter timer, reset to full
+      const state = this.gameService.getTable(tableId);
+      if (state) {
+        const currentPlayer = state.players[state.currentPlayerIndex];
+        if (currentPlayer && currentPlayer.playerId === userId && state.phase !== 'waiting' && state.phase !== 'showdown') {
+          this.connectionService.cancelActionTimer(tableId);
+          this.startTurnTimer(tableId);
+        }
+      }
+    }
+  }
+
+  handleGracePeriodExpired(userId: string) {
+    // Auto-fold if in hand, then mark sitting out
+    for (const table of this.lobbyService.listAllGameStates()) {
+      const seat = table.players.find(p => p.playerId === userId);
+      if (!seat) continue;
+
+      // If it's their turn, auto-fold
+      const currentPlayer = table.players[table.currentPlayerIndex];
+      if (currentPlayer && currentPlayer.playerId === userId && table.phase !== 'waiting' && table.phase !== 'showdown') {
+        this.connectionService.cancelActionTimer(table.tableId);
+        this.gameService.processAction(table.tableId, userId, 'fold');
+      }
+
+      // Mark sitting out
+      seat.sittingOut = true;
+      this.broadcastState(table.tableId);
+    }
+
+    // Start sit-out timer
+    this.connectionService.startSitOutTimer(userId, () => {
+      this.handleSitOutExpired(userId);
+    });
+  }
+
+  handleSitOutExpired(userId: string) {
+    // Remove from all tables
+    const affectedTables = this.lobbyService.removePlayerFromAllTables(userId);
+    for (const tableId of affectedTables) {
+      this.broadcastState(tableId);
+      this.tryPromoteWaitlist(tableId);
+    }
+    this.server.emit('lobby:tables', this.lobbyService.listTables());
+  }
+
   // --- Broadcast ---
 
-  private broadcastState(tableId: string) {
+  broadcastState(tableId: string) {
     const state = this.gameService.getTable(tableId);
     if (!state) return;
 
     // Send personalized view to each seated player
     for (const player of state.players) {
-      const view = this.gameService.getPlayerView(state, player.playerId);
-      this.server.to(player.playerId).emit('game:state', view);
+      const playerData = this.playerService.getByUserId(player.playerId);
+      if (playerData && !playerData.disconnected) {
+        const view = this.gameService.getPlayerView(state, player.playerId);
+        this.server.to(playerData.socketId).emit('game:state', view);
+      }
     }
 
-    // Send spectator view to spectators (in the room but not seated)
+    // Send spectator view to spectators
     const spectatorView = this.gameService.getSpectatorView(state);
     const specSet = this.spectators.get(tableId);
     if (specSet) {
@@ -234,7 +463,7 @@ export class GameGateway {
       }
     }
 
-    // Send preview state to previewers in lobby
+    // Send preview state to previewers
     const previewSet = this.previewers.get(tableId);
     if (previewSet && previewSet.size > 0) {
       this.server.to(`preview:${tableId}`).emit('game:preview:state', spectatorView);
@@ -245,20 +474,18 @@ export class GameGateway {
     const table = this.gameService.getTable(tableId);
     if (!table || table.players.length >= 6) return;
 
-    const nextPlayerId = this.lobbyService.shiftWaitlist(tableId);
-    if (!nextPlayerId) return;
+    const nextUserId = this.lobbyService.shiftWaitlist(tableId);
+    if (!nextUserId) return;
 
-    const player = this.playerService.get(nextPlayerId);
-    if (!player) {
-      // Player disconnected, try next
+    const player = this.playerService.getByUserId(nextUserId);
+    if (!player || player.disconnected) {
       this.tryPromoteWaitlist(tableId);
       return;
     }
 
-    const state = this.gameService.joinTable(tableId, nextPlayerId, player.name, player.chips);
+    const state = this.gameService.joinTable(tableId, player.userId, player.name, player.chips);
     if (state) {
-      // Notify the promoted player
-      const socket = this.server.sockets.sockets.get(nextPlayerId);
+      const socket = this.server.sockets.sockets.get(player.socketId);
       if (socket) {
         socket.join(tableId);
         socket.emit('game:waitlist:promoted', { tableId });
@@ -268,7 +495,6 @@ export class GameGateway {
     }
   }
 
-  // Cleanup on disconnect — called from LobbyGateway
   cleanupSpectator(socketId: string) {
     for (const [, set] of this.spectators) {
       set.delete(socketId);

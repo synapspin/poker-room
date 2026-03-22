@@ -20,6 +20,14 @@ export interface PlayerSeat {
   folded: boolean;
   allIn: boolean;
   acted: boolean;
+  disconnected: boolean;
+  sittingOut: boolean;
+}
+
+export interface TurnTimer {
+  playerId: string;
+  startedAt: number;
+  duration: number;
 }
 
 export interface GameState {
@@ -34,6 +42,7 @@ export interface GameState {
   bigBlind: number;
   currentBet: number;
   winners?: { playerId: string; amount: number; hand: string }[];
+  turnTimer?: TurnTimer;
 }
 
 const SUITS: Suit[] = ['hearts', 'diamonds', 'clubs', 'spades'];
@@ -62,6 +71,10 @@ export class PokerEngine {
   }
 
   initGame(state: GameState): GameState {
+    // Check we have enough active (non-sitting-out) players
+    const activePlayers = state.players.filter(p => !p.sittingOut);
+    if (activePlayers.length < 2) return state;
+
     this.deck = this.shuffleDeck(this.createDeck());
 
     state.phase = 'preflop';
@@ -69,36 +82,51 @@ export class PokerEngine {
     state.pot = 0;
     state.currentBet = 0;
     state.winners = undefined;
+    state.turnTimer = undefined;
 
     // Reset players
     for (const p of state.players) {
       p.cards = [];
       p.bet = 0;
       p.totalBet = 0;
-      p.folded = false;
       p.allIn = false;
       p.acted = false;
+      // Sitting out players auto-fold
+      p.folded = p.sittingOut;
     }
 
-    // Move dealer
-    state.dealerIndex = (state.dealerIndex + 1) % state.players.length;
+    // Move dealer (skip sitting-out players)
+    state.dealerIndex = this.nextNonSittingOut(state, state.dealerIndex);
 
-    // Deal 2 cards to each player
+    // Deal 2 cards to each active player
     for (const p of state.players) {
-      p.cards = [this.deck.pop()!, this.deck.pop()!];
+      if (!p.sittingOut) {
+        p.cards = [this.deck.pop()!, this.deck.pop()!];
+      }
     }
 
-    // Post blinds
-    const sbIndex = (state.dealerIndex + 1) % state.players.length;
-    const bbIndex = (state.dealerIndex + 2) % state.players.length;
+    // Post blinds (skip sitting-out)
+    const sbIndex = this.nextNonSittingOut(state, state.dealerIndex);
+    const bbIndex = this.nextNonSittingOut(state, sbIndex);
 
     this.postBlind(state, sbIndex, state.smallBlind);
     this.postBlind(state, bbIndex, state.bigBlind);
 
     state.currentBet = state.bigBlind;
-    state.currentPlayerIndex = (bbIndex + 1) % state.players.length;
+    state.currentPlayerIndex = this.nextActivePlayer(state, bbIndex);
 
     return state;
+  }
+
+  private nextNonSittingOut(state: GameState, fromIndex: number): number {
+    let next = (fromIndex + 1) % state.players.length;
+    let tries = 0;
+    while (tries < state.players.length) {
+      if (!state.players[next].sittingOut) return next;
+      next = (next + 1) % state.players.length;
+      tries++;
+    }
+    return fromIndex;
   }
 
   private postBlind(state: GameState, index: number, amount: number): void {

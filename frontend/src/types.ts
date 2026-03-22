@@ -13,6 +13,14 @@ export interface PlayerSeat {
   folded: boolean;
   allIn: boolean;
   acted: boolean;
+  disconnected: boolean;
+  sittingOut: boolean;
+}
+
+export interface TurnTimer {
+  playerId: string;
+  startedAt: number;
+  duration: number;
 }
 
 export interface GameState {
@@ -27,6 +35,7 @@ export interface GameState {
   bigBlind: number;
   currentBet: number;
   winners?: { playerId: string; amount: number; hand: string }[];
+  turnTimer?: TurnTimer;
 }
 
 export interface TableInfo {
@@ -42,6 +51,7 @@ export interface TableInfo {
 
 export interface Player {
   id: string;
+  userId: string;
   name: string;
   chips: number;
 }

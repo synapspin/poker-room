@@ -1,296 +1,121 @@
-# Poker Room — PoC
+# Poker Room
 
-Real-time multiplayer Texas Hold'em poker room with lobby system.
+Real-time multiplayer Texas Hold'em poker room with production-grade connection resilience.
 
-**Stack**: NestJS + Socket.IO (backend) | React + Vite (frontend)
+**Stack**: NestJS + Socket.IO | React + Vite | TypeScript
 
----
+## Features
+
+- Texas Hold'em engine with full hand evaluation (Royal Flush → High Card)
+- Real-time multiplayer via WebSocket (Socket.IO)
+- Split-panel lobby with live table preview, filtering & sorting
+- Spectator mode (watch games without playing)
+- Waitlist system (auto-seat when spot opens)
+- **Production-grade reconnection**: persistent identity, 60s grace period, auto-fold/sit-out
+- **Custom heartbeat**: connection quality monitoring (stable/unstable/disconnected)
+- **Action replay queue**: offline action buffering with server-side validation on reconnect
+- Turn timers with auto-actions (30s normal, 15s disconnected)
 
 ## Quick Start
 
 ```bash
-# 1. Install dependencies (from root)
-npm install
+npm install                    # Install all dependencies
 
-# 2. Start backend (terminal 1)
-cd backend && npm run start:dev
+# Terminal 1
+cd backend && npm run start:dev   # Backend → http://localhost:3005
 
-# 3. Start frontend (terminal 2)
-cd frontend && npm run dev
+# Terminal 2
+cd frontend && npm run dev        # Frontend → http://localhost:5173
 ```
 
-- Backend: `http://localhost:3005`
-- Frontend: `http://localhost:5173`
-
-Open 2+ browser tabs, register with different names, create a table, and play.
-
----
+Open 2+ browser tabs, register, create a table, and play.
 
 ## Architecture
 
-### Project Structure
-
-```
-poker-room/
-├── backend/                    # NestJS application
-│   ├── src/
-│   │   ├── main.ts             # Entry point (port 3005)
-│   │   ├── app.module.ts       # Root module
-│   │   ├── player/
-│   │   │   ├── player.module.ts
-│   │   │   └── player.service.ts    # In-memory player registry
-│   │   ├── lobby/
-│   │   │   ├── lobby.module.ts
-│   │   │   ├── lobby.service.ts     # Table management
-│   │   │   └── lobby.gateway.ts     # WebSocket: register, list, create
-│   │   └── game/
-│   │       ├── game.module.ts
-│   │       ├── game.service.ts      # Game orchestration
-│   │       ├── game.gateway.ts      # WebSocket: join, leave, action
-│   │       └── poker-engine.ts      # Texas Hold'em engine
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/                   # React + Vite application
-│   ├── src/
-│   │   ├── main.tsx            # Entry point
-│   │   ├── App.tsx             # Root component, screen routing
-│   │   ├── types.ts            # Shared TypeScript types
-│   │   ├── index.css           # Global styles
-│   │   ├── hooks/
-│   │   │   └── useSocket.ts    # Socket.IO connection hook
-│   │   └── components/
-│   │       ├── Login.tsx       # Player name input
-│   │       ├── Lobby.tsx       # Table list & creation
-│   │       ├── Table.tsx       # Game UI: cards, actions, pot
-│   │       └── CardView.tsx    # Single card renderer
-│   ├── index.html
-│   ├── vite.config.ts
-│   └── package.json
-└── package.json                # npm workspaces root
-```
-
-### NestJS Module Dependency Graph
-
 ```mermaid
-graph TD
-    AppModule --> PlayerModule
-    AppModule --> LobbyModule
-    AppModule --> GameModule
+graph TB
+    subgraph "Frontend (React + Vite)"
+        App["App.tsx — Screen Router"]
+        Hooks["useSocket / useHeartbeat / useActionQueue"]
+        Login["Login"]
+        Lobby["Lobby (split-panel)"]
+        Table["Table (player + spectator)"]
+    end
 
-    PlayerModule --> PlayerService["PlayerService<br/><i>in-memory player storage</i>"]
+    subgraph "Backend (NestJS)"
+        LG["LobbyGateway<br/>register, reconnect, heartbeat"]
+        GG["GameGateway<br/>join, action, spectate, replay"]
+        LS["LobbyService — tables, waitlists"]
+        GS["GameService — game orchestration"]
+        PS["PlayerService — persistent identity"]
+        CS["ConnectionService — timers"]
+        PE["PokerEngine — Texas Hold'em"]
+    end
 
-    LobbyModule --> LobbyGateway["LobbyGateway<br/><i>WS: register, list, create</i>"]
-    LobbyModule --> LobbyService["LobbyService<br/><i>table CRUD</i>"]
-    LobbyModule -.->|imports| PlayerModule
-
-    GameModule --> GameGateway["GameGateway<br/><i>WS: join, leave, start, action</i>"]
-    GameModule --> GameService["GameService<br/><i>orchestration + state sanitization</i>"]
-    GameModule --> PokerEngine["PokerEngine<br/><i>core poker logic</i>"]
-    GameModule -.->|imports| LobbyModule
-    GameModule -.->|imports| PlayerModule
+    App --> Hooks
+    Hooks <-->|"WebSocket<br/>(Socket.IO)"| LG
+    Hooks <-->|"WebSocket"| GG
+    LG --> LS
+    LG --> PS
+    LG --> CS
+    GG --> GS
+    GG --> CS
+    GS --> PE
+    GS --> LS
 ```
 
-### Frontend Screen Flow
+## Connection Resilience
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Login
-    Login --> Lobby : player:register
-    Lobby --> Table : game:join
-    Table --> Lobby : game:leave
-    Lobby --> Lobby : lobby:create / lobby:list
-
-    state Table {
-        Waiting --> Preflop : game:start
-        Preflop --> Flop : betting done
-        Flop --> Turn : betting done
-        Turn --> River : betting done
-        River --> Showdown : betting done
-        Showdown --> Preflop : auto 5s
-    }
+    Connected --> SoftDisconnect : missed heartbeats (15s)
+    SoftDisconnect --> Connected : heartbeat restored
+    Connected --> GracePeriod : socket disconnect (60s timer)
+    SoftDisconnect --> GracePeriod : socket disconnect
+    GracePeriod --> Connected : reconnect within 60s
+    GracePeriod --> SittingOut : expired → auto-fold
+    SittingOut --> Connected : reconnect + sit back
+    SittingOut --> Removed : 3 min timeout
 ```
 
-### Client-Server Communication
+- **Heartbeat**: client pings every 5s, server tracks quality
+- **Grace period**: 60s to reconnect, seat reserved
+- **Auto-actions**: disconnected player's turn → auto-fold/check after 15s
+- **Action replay**: actions sent offline are buffered and replayed on reconnect
+- **Sitting out**: auto sit-out after grace period, 3 min before removal
 
-```mermaid
-sequenceDiagram
-    participant C as Client (React)
-    participant S as Server (NestJS)
+## Documentation
 
-    C->>S: player:register { name }
-    S->>C: player:registered { id, name, chips }
+| Document | Description |
+|---|---|
+| [Getting Started](docs/01-getting-started.md) | Installation, running, scripts, tech stack |
+| [Architecture](docs/02-architecture.md) | Project structure, module graph, component tree, data flow |
+| [WebSocket Protocol](docs/03-websocket-protocol.md) | All events, payloads, rooms, visibility rules |
+| [Connection Resilience](docs/04-connection-resilience.md) | Heartbeat, reconnect, grace period, replay queue, sit-out |
+| [Game Engine](docs/05-game-engine.md) | Phases, betting logic, hand evaluation, pot management |
+| [Lobby & Spectators](docs/06-lobby-and-spectators.md) | Split-panel lobby, preview, spectator mode, waitlist |
+| [Frontend Guide](docs/07-frontend-guide.md) | Screens, hooks, components, connection state UI |
+| [Data Types](docs/08-data-types.md) | All interfaces, types, constants reference |
 
-    C->>S: lobby:list
-    S->>C: lobby:tables [TableInfo[]]
+## WebSocket Events (Summary)
 
-    C->>S: lobby:create { name, smallBlind, bigBlind }
-    S->>C: lobby:created { tableId }
-    S-->>C: lobby:tables (broadcast)
+| Category | Events |
+|---|---|
+| **Player** | `player:register`, `player:reconnect`, `heartbeat` |
+| **Lobby** | `lobby:list`, `lobby:create`, `lobby:tables` |
+| **Game** | `game:join`, `game:leave`, `game:start`, `game:action` |
+| **Replay** | `game:action:replay`, `game:action:ack` |
+| **Spectator** | `game:spectate`, `game:preview`, `game:preview:state` |
+| **Sit-out** | `game:sitout`, `game:sitback` |
+| **Waitlist** | `game:waitlist:join`, `game:waitlist:leave`, `game:waitlist:promoted` |
 
-    C->>S: game:join { tableId }
-    S->>C: game:state (personalized)
-    S-->>C: lobby:tables (broadcast)
-
-    C->>S: game:start { tableId }
-    S->>C: game:state (preflop, cards dealt)
-
-    loop Betting Rounds
-        S->>C: game:state (current turn)
-        C->>S: game:action { tableId, action, amount? }
-        S->>C: game:state (updated)
-    end
-
-    S->>C: game:state (showdown + winners)
-    Note over S: 5s delay
-    S->>C: game:state (new hand auto-start)
-```
-
----
-
-## WebSocket Protocol
-
-All communication uses Socket.IO over WebSocket transport.
-
-### Player Events
-
-| Event | Direction | Payload | Description |
-|---|---|---|---|
-| `player:register` | Client → Server | `{ name }` | Register player (1000 starting chips) |
-| `player:registered` | Server → Client | `{ id, name, chips }` | Registration confirmed |
-
-### Lobby Events
-
-| Event | Direction | Payload | Description |
-|---|---|---|---|
-| `lobby:list` | Client → Server | — | Request table list |
-| `lobby:tables` | Server → All | `TableInfo[]` | Updated table list |
-| `lobby:create` | Client → Server | `{ name?, smallBlind?, bigBlind? }` | Create new table |
-| `lobby:created` | Server → Client | `{ tableId }` | Table created, ready to join |
-
-### Game Events
-
-| Event | Direction | Payload | Description |
-|---|---|---|---|
-| `game:join` | Client → Server | `{ tableId }` | Join a table |
-| `game:leave` | Client → Server | `{ tableId }` | Leave a table |
-| `game:start` | Client → Server | `{ tableId }` | Start hand (min 2 players) |
-| `game:action` | Client → Server | `{ tableId, action, amount? }` | Player action |
-| `game:state` | Server → Client | `GameState` | Personalized game state update |
-| `error` | Server → Client | `{ message }` | Error notification |
-
-**Actions**: `fold` | `check` | `call` | `raise` | `all-in`
-
----
-
-## Game Flow
-
-### Texas Hold'em Phases
-
-```mermaid
-graph LR
-    W[waiting] -->|game:start| P[preflop<br/>2 cards + blinds]
-    P -->|betting done| F[flop<br/>+3 community cards]
-    F -->|betting done| T[turn<br/>+1 card]
-    T -->|betting done| R[river<br/>+1 card]
-    R -->|betting done| S[showdown<br/>evaluate winners]
-    S -->|5s auto| P
-```
-
-### Betting Round Logic
-
-```mermaid
-flowchart TD
-    Turn["Current Player's Turn"] --> Fold
-    Turn --> Check["Check<br/>(if bet matched)"]
-    Turn --> Call
-    Turn --> Raise
-    Turn --> AllIn["All-In"]
-
-    Fold --> NextCheck
-    Check --> NextCheck
-    Call --> NextCheck
-
-    Raise --> Reset["Reset other players<br/>'acted' flags"]
-    AllIn --> RaiseCheck{"Bet > current?"}
-    RaiseCheck -->|Yes| Reset
-    RaiseCheck -->|No| NextCheck
-
-    Reset --> NextCheck{"All acted &<br/>bets matched?"}
-
-    NextCheck -->|Yes| NextPhase["Advance Phase"]
-    NextCheck -->|No| NextPlayer["Next Active Player"]
-    NextPlayer --> Turn
-```
-
-### Hand Rankings (best 5 of 7 cards)
-
-| Rank | Hand | Score |
-|---:|---|---|
-| 1 | Royal Flush | 9×10¹⁰ |
-| 2 | Straight Flush | 8×10¹⁰ |
-| 3 | Four of a Kind | 7×10¹⁰ |
-| 4 | Full House | 6×10¹⁰ |
-| 5 | Flush | 5×10¹⁰ |
-| 6 | Straight | 4×10¹⁰ |
-| 7 | Three of a Kind | 3×10¹⁰ |
-| 8 | Two Pair | 2×10¹⁰ |
-| 9 | One Pair | 1×10¹⁰ |
-| 10 | High Card | kickers |
-
----
-
-## Key Data Types
-
-### GameState (server → client)
-
-```typescript
-{
-  tableId: string
-  phase: 'waiting' | 'preflop' | 'flop' | 'turn' | 'river' | 'showdown'
-  communityCards: Card[]       // 0–5 cards
-  pot: number
-  players: PlayerSeat[]
-  currentPlayerIndex: number
-  dealerIndex: number
-  smallBlind: number
-  bigBlind: number
-  currentBet: number
-  winners?: { playerId, amount, hand }[]
-}
-```
-
-### PlayerSeat
-
-```typescript
-{
-  playerId: string
-  name: string
-  chips: number
-  cards: Card[]     // hidden for opponents (empty array)
-  bet: number       // current round bet
-  totalBet: number  // total hand bet
-  folded: boolean
-  allIn: boolean
-}
-```
-
-### Card
-
-```typescript
-{
-  rank: '2'–'10' | 'J' | 'Q' | 'K' | 'A'
-  suit: 'hearts' | 'diamonds' | 'clubs' | 'spades'
-}
-```
-
----
+Full protocol: [docs/03-websocket-protocol.md](docs/03-websocket-protocol.md)
 
 ## Design Decisions
 
-- **In-memory storage** — all state lives in memory, resets on restart (PoC scope)
-- **Personalized state** — each player receives `game:state` with only their own cards visible (opponents' cards = `[]`), except during showdown
-- **Socket.IO rooms** — players at same table share a room (`tableId`) for efficient broadcasting
-- **Auto-restart** — new hand starts automatically 5 seconds after showdown if 2+ players have chips
-- **Table cleanup** — empty tables are automatically deleted when last player disconnects
-- **Max 6 players per table** — configurable in lobby service
-- **Starting stack** — 1000 chips per player
+- **In-memory storage** — all state resets on restart (PoC scope)
+- **Persistent userId** — UUID in localStorage survives reconnects
+- **Personalized state** — each player sees only their own cards (except showdown)
+- **Spectator view** — all cards hidden, shared between spectators and lobby preview
+- **Socket.IO rooms** — per-table rooms for efficient broadcasting
+- **forwardRef modules** — resolves NestJS circular dependency between Lobby and Game modules

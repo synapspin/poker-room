@@ -7,6 +7,6 @@ import { PlayerModule } from '../player/player.module';
 @Module({
   imports: [forwardRef(() => LobbyModule), PlayerModule],
   providers: [GameGateway, GameService],
-  exports: [GameGateway],
+  exports: [GameGateway, GameService],
 })
 export class GameModule {}

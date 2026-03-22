@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { GameState } from '../types';
 import { CardView } from './CardView';
+import { TurnTimerBar } from './TurnTimerBar';
 
 interface TableProps {
   gameState: GameState;
@@ -8,10 +9,16 @@ interface TableProps {
   onAction: (action: string, amount?: number) => void;
   onLeave: () => void;
   onStart: () => void;
+  onSitOut?: () => void;
+  onSitBack?: () => void;
   spectator?: boolean;
+  pendingActions?: number;
 }
 
-export function Table({ gameState, playerId, onAction, onLeave, onStart, spectator = false }: TableProps) {
+export function Table({
+  gameState, playerId, onAction, onLeave, onStart,
+  onSitOut, onSitBack, spectator = false, pendingActions = 0,
+}: TableProps) {
   const [raiseAmount, setRaiseAmount] = useState(gameState.bigBlind * 2);
 
   const myPlayer = gameState.players.find(p => p.playerId === playerId);
@@ -21,6 +28,7 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart, spectat
   const isShowdown = gameState.phase === 'showdown';
   const canCheck = isMyTurn && myPlayer && myPlayer.bet >= gameState.currentBet;
   const callAmount = myPlayer ? gameState.currentBet - myPlayer.bet : 0;
+  const isSittingOut = myPlayer?.sittingOut ?? false;
 
   return (
     <div style={{ width: '100%', maxWidth: 800 }}>
@@ -32,14 +40,22 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart, spectat
           </button>
           {spectator && (
             <span style={{
-              fontSize: 12,
-              padding: '4px 10px',
-              borderRadius: 4,
-              background: '#0f3460',
-              color: '#4ecca3',
+              fontSize: 12, padding: '4px 10px', borderRadius: 4,
+              background: '#0f3460', color: '#4ecca3',
             }}>
               SPECTATOR
             </span>
+          )}
+          {!spectator && isSeated && !isWaiting && (
+            isSittingOut ? (
+              <button onClick={onSitBack} style={{ background: '#4ecca3', color: '#1a1a2e', fontSize: 12 }}>
+                Sit Back
+              </button>
+            ) : (
+              <button onClick={onSitOut} style={{ background: '#666', color: '#eee', fontSize: 12 }}>
+                Sit Out
+              </button>
+            )
           )}
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -102,6 +118,7 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart, spectat
           const isCurrentTurn = idx === gameState.currentPlayerIndex && !isWaiting && !isShowdown;
           const isMe = !spectator && player.playerId === playerId;
           const isDealer = idx === gameState.dealerIndex;
+          const showTimer = isCurrentTurn && gameState.turnTimer && gameState.turnTimer.playerId === player.playerId;
 
           return (
             <div
@@ -111,9 +128,42 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart, spectat
                 padding: 12,
                 borderRadius: 8,
                 border: isCurrentTurn ? '2px solid #e94560' : '2px solid transparent',
-                opacity: player.folded ? 0.5 : 1,
+                opacity: player.folded || player.sittingOut ? 0.5 : 1,
+                position: 'relative',
               }}
             >
+              {/* Disconnected badge */}
+              {player.disconnected && (
+                <div style={{
+                  position: 'absolute',
+                  top: 4,
+                  right: 4,
+                  fontSize: 10,
+                  padding: '2px 6px',
+                  borderRadius: 3,
+                  background: '#e94560',
+                  color: '#fff',
+                }}>
+                  OFFLINE
+                </div>
+              )}
+
+              {/* Sitting out badge */}
+              {player.sittingOut && !player.disconnected && (
+                <div style={{
+                  position: 'absolute',
+                  top: 4,
+                  right: 4,
+                  fontSize: 10,
+                  padding: '2px 6px',
+                  borderRadius: 3,
+                  background: '#666',
+                  color: '#fff',
+                }}>
+                  SIT OUT
+                </div>
+              )}
+
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontWeight: 600 }}>
                   {player.name} {isMe ? '(You)' : ''} {isDealer ? 'D' : ''}
@@ -125,9 +175,16 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart, spectat
               <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
                 {player.cards.length > 0
                   ? player.cards.map((card, i) => <CardView key={i} card={card} />)
-                  : !isWaiting && <><CardView hidden /><CardView hidden /></>
+                  : !isWaiting && !player.sittingOut && <><CardView hidden /><CardView hidden /></>
                 }
               </div>
+
+              {/* Turn timer */}
+              {showTimer && gameState.turnTimer && (
+                <div style={{ marginTop: 6 }}>
+                  <TurnTimerBar timer={gameState.turnTimer} />
+                </div>
+              )}
 
               {/* Status line */}
               <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>
@@ -145,13 +202,29 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart, spectat
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={onStart}
-            disabled={gameState.players.length < 2}
+            disabled={gameState.players.filter(p => !p.sittingOut).length < 2}
             style={{ background: '#4ecca3', color: '#1a1a2e', padding: '12px 32px', fontSize: 16 }}
           >
-            {gameState.players.length < 2
-              ? `Waiting for players (${gameState.players.length}/2)...`
+            {gameState.players.filter(p => !p.sittingOut).length < 2
+              ? `Waiting for active players...`
               : 'Start Game'}
           </button>
+        </div>
+      )}
+
+      {/* Pending actions indicator */}
+      {pendingActions > 0 && (
+        <div style={{
+          textAlign: 'center',
+          padding: 8,
+          marginBottom: 8,
+          background: '#f0a500',
+          color: '#1a1a2e',
+          borderRadius: 6,
+          fontSize: 13,
+          fontWeight: 600,
+        }}>
+          {pendingActions} action{pendingActions > 1 ? 's' : ''} pending... (will replay on reconnect)
         </div>
       )}
 
