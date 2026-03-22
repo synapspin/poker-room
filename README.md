@@ -102,6 +102,7 @@ stateDiagram-v2
 | [Lobby & Spectators](docs/06-lobby-and-spectators.md) | Split-panel lobby, preview, spectator mode, waitlist |
 | [Frontend Guide](docs/07-frontend-guide.md) | Screens, hooks, components, connection state UI |
 | [Data Types](docs/08-data-types.md) | All interfaces, types, constants reference |
+| [Chat System](docs/09-chat-system.md) | Table chat, dealer narration, rate limiting, spam protection |
 
 ## WebSocket Events (Summary)
 
