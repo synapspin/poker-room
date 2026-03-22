@@ -189,17 +189,8 @@ export class GameGateway {
     }
 
     if (result.message) {
-      // Send to everyone in the table room + spectators + previewers
+      // All seated players and spectators are in room tableId
       this.server.to(data.tableId).emit('chat:message', result.message);
-      // Also send to personalized player sockets (they're in individual rooms)
-      if (table) {
-        for (const p of table.players) {
-          const pd = this.playerService.getByUserId(p.playerId);
-          if (pd && !pd.disconnected) {
-            this.server.to(pd.socketId).emit('chat:message', result.message);
-          }
-        }
-      }
     }
   }
 
@@ -214,31 +205,13 @@ export class GameGateway {
 
   private emitDealerMessage(tableId: string, text: string) {
     const msg = this.chatService.addSystemMessage(tableId, text, 'dealer');
+    // All seated players and spectators are in room tableId — single emit is enough
     this.server.to(tableId).emit('chat:message', msg);
-    // Also to seated players' personal sockets
-    const table = this.gameService.getTable(tableId);
-    if (table) {
-      for (const p of table.players) {
-        const pd = this.playerService.getByUserId(p.playerId);
-        if (pd && !pd.disconnected) {
-          this.server.to(pd.socketId).emit('chat:message', msg);
-        }
-      }
-    }
   }
 
   private emitSystemMessage(tableId: string, text: string) {
     const msg = this.chatService.addSystemMessage(tableId, text, 'system');
     this.server.to(tableId).emit('chat:message', msg);
-    const table = this.gameService.getTable(tableId);
-    if (table) {
-      for (const p of table.players) {
-        const pd = this.playerService.getByUserId(p.playerId);
-        if (pd && !pd.disconnected) {
-          this.server.to(pd.socketId).emit('chat:message', msg);
-        }
-      }
-    }
   }
 
   // --- Core game events ---
