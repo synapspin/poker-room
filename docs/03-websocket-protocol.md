@@ -136,6 +136,8 @@ graph TD
 | `folded` | Visible | Visible | Visible | Visible |
 | `disconnected` | Visible | Visible | Visible | Visible |
 | `sittingOut` | Visible | Visible | Visible | Visible |
+| `spectators[]` | Included | Included | Included | Included |
+| `maxPlayers` | Included | Included | Included | Included |
 
 ## Socket.IO Rooms
 

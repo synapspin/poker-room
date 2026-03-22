@@ -129,8 +129,28 @@ export function Table({
           )}
 
           {/* Player seats */}
-          {gameState.players.map((player, idx) => {
-            const pos = SEAT_POSITIONS[idx % SEAT_POSITIONS.length];
+          {/* All 6 seat positions: occupied or empty */}
+          {SEAT_POSITIONS.map((pos, idx) => {
+            const player = gameState.players[idx];
+
+            if (!player) {
+              // Empty seat
+              return (
+                <div
+                  key={`empty-${idx}`}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1"
+                  style={{ top: pos.top, left: pos.left }}
+                >
+                  <div className="w-[90px] rounded-xl border border-dashed border-outline-variant/20 py-3 flex flex-col items-center gap-1 opacity-30">
+                    <span className="material-symbols-outlined text-on-surface-variant text-lg">event_seat</span>
+                    <span className="font-label text-[8px] uppercase tracking-wider text-on-surface-variant">
+                      Seat {idx + 1}
+                    </span>
+                  </div>
+                </div>
+              );
+            }
+
             const isCurrentTurn = idx === gameState.currentPlayerIndex && !isWaiting && !isShowdown;
             const isMe = !spectator && player.playerId === playerId;
             const isDealer = idx === gameState.dealerIndex;
@@ -200,6 +220,46 @@ export function Table({
             );
           })}
         </div>
+
+        {/* The Rail — spectator zone */}
+        {gameState.spectators && gameState.spectators.length > 0 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+            <div className="glass-panel rounded-xl px-4 py-2 flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-on-surface-variant">visibility</span>
+                <span className="font-label text-[10px] uppercase tracking-[0.15em] text-on-surface-variant">
+                  The Rail
+                </span>
+              </div>
+
+              <div className="h-4 w-px bg-outline-variant/20" />
+
+              {/* Spectator avatars */}
+              <div className="flex items-center">
+                {gameState.spectators.slice(0, 8).map((spec, i) => (
+                  <div
+                    key={spec.odId || i}
+                    className="h-6 w-6 rounded-full bg-surface-container-highest border border-surface-container flex items-center justify-center -ml-1.5 first:ml-0"
+                    title={spec.name}
+                  >
+                    <span className="text-[8px] font-label font-bold text-on-surface-variant">
+                      {spec.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                ))}
+                {gameState.spectators.length > 8 && (
+                  <span className="ml-2 text-on-surface-variant text-[10px] font-label">
+                    +{gameState.spectators.length - 8}
+                  </span>
+                )}
+              </div>
+
+              <span className="font-label text-[10px] text-on-surface-variant">
+                {gameState.spectators.length} watching
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Pending actions */}

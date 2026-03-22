@@ -43,6 +43,8 @@ export interface GameState {
   currentBet: number;
   winners?: { playerId: string; amount: number; hand: string }[];
   turnTimer?: TurnTimer;
+  spectators?: { name: string; odId: string }[];
+  maxPlayers?: number;
 }
 
 const SUITS: Suit[] = ['hearts', 'diamonds', 'clubs', 'spades'];

@@ -101,6 +101,54 @@ flowchart LR
 | Actions | Join / Watch / Waitlist buttons | Stop Watching button |
 | View | Same spectator view | Same spectator view |
 
+## The Rail — Spectator Display
+
+In real poker, spectators watch from "the rail" — a barrier around the table. The app mirrors this:
+
+```
+┌──────────────────────────────────────────┐
+│              Poker Table                  │
+│    [Seat 1]  [Seat 2]  [Seat 3]         │
+│                                          │
+│    [Seat 6]  [Seat 5]  [Seat 4]         │
+│                                          │
+│  ┌──────────────────────────────────┐    │
+│  │ 👁 The Rail  │ (A)(B)(C) +2  5 watching │
+│  └──────────────────────────────────┘    │
+└──────────────────────────────────────────┘
+```
+
+**How it works:**
+
+- Server tracks spectator names via `GameGateway.getSpectatorList()`
+- `broadcastState()` includes `spectators[]` array in every `game:state` payload
+- Both seated players and spectators see "The Rail" panel
+
+**Visual design:**
+- Glass-panel bar at the bottom of the table area
+- Eye icon + "The Rail" label
+- Spectator avatars (first initial, up to 8 shown, then "+N")
+- Tooltip on each avatar shows full name
+- Counter: "N watching"
+
+**Empty seats:**
+- All 6 seat positions are always rendered
+- Empty seats show a dashed-border placeholder with chair icon and "Seat N"
+- 30% opacity to distinguish from occupied seats
+
+**Data in GameState:**
+
+```typescript
+{
+  ...gameState,
+  spectators: [
+    { name: "Alice", odId: "uuid-1" },
+    { name: "Bob", odId: "uuid-2" }
+  ],
+  maxPlayers: 6
+}
+```
+
 ## Waitlist System
 
 When a table is full (6/6 players), players can join a waitlist:

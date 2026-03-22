@@ -453,21 +453,40 @@ export class GameGateway {
 
   // --- Broadcast ---
 
+  private getSpectatorList(tableId: string): { name: string; odId: string }[] {
+    const specSet = this.spectators.get(tableId);
+    if (!specSet || specSet.size === 0) return [];
+    const list: { name: string; odId: string }[] = [];
+    for (const socketId of specSet) {
+      const player = this.playerService.get(socketId);
+      if (player) {
+        list.push({ name: player.name, odId: player.userId });
+      }
+    }
+    return list;
+  }
+
   broadcastState(tableId: string) {
     const state = this.gameService.getTable(tableId);
     if (!state) return;
+
+    const spectatorList = this.getSpectatorList(tableId);
 
     // Send personalized view to each seated player
     for (const player of state.players) {
       const playerData = this.playerService.getByUserId(player.playerId);
       if (playerData && !playerData.disconnected) {
         const view = this.gameService.getPlayerView(state, player.playerId);
+        view.spectators = spectatorList;
+        view.maxPlayers = 6;
         this.server.to(playerData.socketId).emit('game:state', view);
       }
     }
 
     // Send spectator view to spectators
     const spectatorView = this.gameService.getSpectatorView(state);
+    spectatorView.spectators = spectatorList;
+    spectatorView.maxPlayers = 6;
     const specSet = this.spectators.get(tableId);
     if (specSet) {
       for (const socketId of specSet) {
@@ -478,7 +497,10 @@ export class GameGateway {
     // Send preview state to previewers
     const previewSet = this.previewers.get(tableId);
     if (previewSet && previewSet.size > 0) {
-      this.server.to(`preview:${tableId}`).emit('game:preview:state', spectatorView);
+      const previewView = this.gameService.getSpectatorView(state);
+      previewView.spectators = spectatorList;
+      previewView.maxPlayers = 6;
+      this.server.to(`preview:${tableId}`).emit('game:preview:state', previewView);
     }
   }
 

@@ -78,6 +78,8 @@ interface GameState {
     hand: string;        // "Royal Flush", "Full House", "Last standing", etc.
   }[];
   turnTimer?: TurnTimer;
+  spectators?: { name: string; odId: string }[];  // Spectators at the rail
+  maxPlayers?: number;                              // Always 6
 }
 ```
 

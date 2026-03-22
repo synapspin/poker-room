@@ -23,6 +23,11 @@ export interface TurnTimer {
   duration: number;
 }
 
+export interface SpectatorInfo {
+  name: string;
+  odId: string;
+}
+
 export interface GameState {
   tableId: string;
   phase: string;
@@ -36,6 +41,8 @@ export interface GameState {
   currentBet: number;
   winners?: { playerId: string; amount: number; hand: string }[];
   turnTimer?: TurnTimer;
+  spectators?: SpectatorInfo[];
+  maxPlayers?: number;
 }
 
 export interface TableInfo {
