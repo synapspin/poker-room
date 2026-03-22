@@ -37,10 +37,24 @@ export interface TableInfo {
   smallBlind: number;
   bigBlind: number;
   phase: string;
+  waitlistCount: number;
 }
 
 export interface Player {
   id: string;
   name: string;
   chips: number;
+}
+
+export type PhaseFilter = 'all' | 'waiting' | 'playing';
+export type SortBy = 'name' | 'players' | 'blinds';
+export type SortDir = 'asc' | 'desc';
+
+export interface TableFiltersState {
+  phase: PhaseFilter;
+  minBlind: number;
+  maxBlind: number;
+  hasSeats: boolean;
+  sortBy: SortBy;
+  sortDir: SortDir;
 }

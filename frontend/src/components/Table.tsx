@@ -8,13 +8,15 @@ interface TableProps {
   onAction: (action: string, amount?: number) => void;
   onLeave: () => void;
   onStart: () => void;
+  spectator?: boolean;
 }
 
-export function Table({ gameState, playerId, onAction, onLeave, onStart }: TableProps) {
+export function Table({ gameState, playerId, onAction, onLeave, onStart, spectator = false }: TableProps) {
   const [raiseAmount, setRaiseAmount] = useState(gameState.bigBlind * 2);
 
   const myPlayer = gameState.players.find(p => p.playerId === playerId);
-  const isMyTurn = gameState.players[gameState.currentPlayerIndex]?.playerId === playerId;
+  const isSeated = !!myPlayer;
+  const isMyTurn = !spectator && isSeated && gameState.players[gameState.currentPlayerIndex]?.playerId === playerId;
   const isWaiting = gameState.phase === 'waiting';
   const isShowdown = gameState.phase === 'showdown';
   const canCheck = isMyTurn && myPlayer && myPlayer.bet >= gameState.currentBet;
@@ -24,9 +26,22 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart }: Table
     <div style={{ width: '100%', maxWidth: 800 }}>
       {/* Top bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <button onClick={onLeave} style={{ background: '#333', color: '#eee' }}>
-          Leave Table
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button onClick={onLeave} style={{ background: '#333', color: '#eee' }}>
+            {spectator ? 'Stop Watching' : 'Leave Table'}
+          </button>
+          {spectator && (
+            <span style={{
+              fontSize: 12,
+              padding: '4px 10px',
+              borderRadius: 4,
+              background: '#0f3460',
+              color: '#4ecca3',
+            }}>
+              SPECTATOR
+            </span>
+          )}
+        </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <span style={{ color: '#888' }}>Phase: <b style={{ color: '#4ecca3' }}>{gameState.phase}</b></span>
           <span style={{ color: '#888' }}>Pot: <b style={{ color: '#e94560' }}>{gameState.pot}</b></span>
@@ -85,7 +100,7 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart }: Table
       }}>
         {gameState.players.map((player, idx) => {
           const isCurrentTurn = idx === gameState.currentPlayerIndex && !isWaiting && !isShowdown;
-          const isMe = player.playerId === playerId;
+          const isMe = !spectator && player.playerId === playerId;
           const isDealer = idx === gameState.dealerIndex;
 
           return (
@@ -125,8 +140,8 @@ export function Table({ gameState, playerId, onAction, onLeave, onStart }: Table
         })}
       </div>
 
-      {/* Actions */}
-      {isWaiting && (
+      {/* Actions — only for seated non-spectator players */}
+      {!spectator && isSeated && isWaiting && (
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={onStart}

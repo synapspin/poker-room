@@ -26,6 +26,9 @@ export class GameService {
       acted: false,
     });
 
+    // Remove from waitlist if was waiting
+    this.lobbyService.removeFromWaitlist(tableId, playerId);
+
     return table;
   }
 
@@ -56,13 +59,24 @@ export class GameService {
     return this.lobbyService.getTable(tableId);
   }
 
-  // Create a sanitized state for a specific player (hide other players' cards)
+  // Personalized view for a seated player (hide other players' cards)
   getPlayerView(state: GameState, playerId: string): GameState {
     return {
       ...state,
       players: state.players.map(p => ({
         ...p,
         cards: p.playerId === playerId || state.phase === 'showdown' ? p.cards : [],
+      })),
+    };
+  }
+
+  // Spectator/preview view — all cards hidden except during showdown
+  getSpectatorView(state: GameState): GameState {
+    return {
+      ...state,
+      players: state.players.map(p => ({
+        ...p,
+        cards: state.phase === 'showdown' ? p.cards : [],
       })),
     };
   }
