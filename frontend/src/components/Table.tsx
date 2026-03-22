@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { Socket } from 'socket.io-client';
 import { GameState } from '../types';
 import { CardView } from './CardView';
 import { TurnTimerBar } from './TurnTimerBar';
+import { ChatPanel } from './ChatPanel';
 
 interface TableProps {
   gameState: GameState;
   playerId: string;
+  socket: Socket;
   onAction: (action: string, amount?: number) => void;
   onLeave: () => void;
   onStart: () => void;
@@ -26,10 +29,11 @@ const SEAT_POSITIONS = [
 ];
 
 export function Table({
-  gameState, playerId, onAction, onLeave, onStart,
+  gameState, playerId, socket, onAction, onLeave, onStart,
   onSitOut, onSitBack, spectator = false, pendingActions = 0,
 }: TableProps) {
   const [raiseAmount, setRaiseAmount] = useState(gameState.bigBlind * 2);
+  const [chatOpen, setChatOpen] = useState(true);
 
   const myPlayer = gameState.players.find(p => p.playerId === playerId);
   const isSeated = !!myPlayer;
@@ -74,10 +78,19 @@ export function Table({
             <span className="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Phase</span>
             <span className="font-label text-xs font-bold text-primary uppercase">{gameState.phase}</span>
           </div>
+          <button
+            onClick={() => setChatOpen(!chatOpen)}
+            className="p-1.5 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-primary transition-colors duration-200 hidden md:flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-sm">chat</span>
+            <span className="font-label text-[10px] uppercase tracking-wider">{chatOpen ? 'Hide' : 'Chat'}</span>
+          </button>
         </div>
       </div>
 
-      {/* Main table area */}
+      {/* Main area: table + chat */}
+      <div className="flex-1 flex overflow-hidden">
+      {/* Table area */}
       <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
         {/* Oval poker table */}
         <div className="relative w-full max-w-4xl aspect-[21/10]">
@@ -261,6 +274,27 @@ export function Table({
           </div>
         )}
       </div>
+
+      {/* Chat panel — right side */}
+      {chatOpen ? (
+        <div className="hidden md:flex">
+          <ChatPanel
+            socket={socket}
+            tableId={gameState.tableId}
+            playerId={playerId}
+            onToggle={() => setChatOpen(false)}
+          />
+        </div>
+      ) : (
+        <ChatPanel
+          socket={socket}
+          tableId={gameState.tableId}
+          playerId={playerId}
+          collapsed
+          onToggle={() => setChatOpen(true)}
+        />
+      )}
+      </div>{/* end flex main area */}
 
       {/* Pending actions */}
       {pendingActions > 0 && (

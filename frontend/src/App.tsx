@@ -167,10 +167,11 @@ export default function App() {
           />
         )}
 
-        {screen === 'table' && gameState && player && (
+        {screen === 'table' && gameState && player && socket && (
           <Table
             gameState={gameState}
             playerId={player.userId}
+            socket={socket}
             onAction={handleAction}
             onLeave={handleLeaveTable}
             onStart={handleStartGame}
@@ -180,10 +181,11 @@ export default function App() {
           />
         )}
 
-        {screen === 'spectator' && gameState && player && (
+        {screen === 'spectator' && gameState && player && socket && (
           <Table
             gameState={gameState}
             playerId={player.userId}
+            socket={socket}
             onAction={handleAction}
             onLeave={handleLeaveTable}
             onStart={handleStartGame}

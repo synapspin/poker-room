@@ -20,6 +20,7 @@ Real-time multiplayer Texas Hold'em poker room with production-grade connection 
 - **Action replay queue**: offline action buffering with server-side validation on reconnect
 - Turn timers with auto-actions (30s normal, 15s disconnected)
 - **Per-tab sessions**: each browser tab = separate player (sessionStorage)
+- **Table chat**: player/spectator messages, dealer narration, rate limiting (5/10s), auto-mute
 
 ## Quick Start
 
@@ -110,6 +111,7 @@ stateDiagram-v2
 | **Lobby** | `lobby:list`, `lobby:create`, `lobby:tables` |
 | **Game** | `game:join`, `game:leave`, `game:start`, `game:action` |
 | **Replay** | `game:action:replay`, `game:action:ack` |
+| **Chat** | `chat:send`, `chat:message`, `chat:history`, `chat:error` |
 | **Spectator** | `game:spectate`, `game:preview`, `game:preview:state` |
 | **Sit-out** | `game:sitout`, `game:sitback` |
 | **Waitlist** | `game:waitlist:join`, `game:waitlist:leave`, `game:waitlist:promoted` |

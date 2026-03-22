@@ -96,6 +96,27 @@ Reasons: `expired` (>60s old), `invalid_action`, `skipped_after_failure`
 | `game:unpreview` | C → S | `{ tableId }` | Unsubscribe from preview |
 | `game:preview:state` | S → C | `GameState` | Preview state (spectator view) |
 
+### Chat Events
+
+| Event | Direction | Payload | Description |
+|---|---|---|---|
+| `chat:send` | C → S | `{ tableId, text }` | Send chat message (max 200 chars) |
+| `chat:message` | S → All | `ChatMessage` | New message broadcast |
+| `chat:history` | C → S | `{ tableId }` | Request message history |
+| `chat:history` | S → C | `{ tableId, messages[] }` | History response (last 100) |
+| `chat:error` | S → C | `{ message }` | Rate limit / mute notification |
+
+**ChatMessage types**: `player`, `spectator`, `system`, `dealer`
+
+**Rate limiting**: max 5 messages per 10 seconds. Exceeded → 60s mute.
+
+**Dealer messages** (auto-generated):
+- Hand started with blind amounts
+- Player actions (fold, check, call, raise, all-in)
+- Phase transitions (Flop, Turn, River)
+- Winners with hand name and amount
+- Player join/leave notifications
+
 ### Sit-Out Events
 
 | Event | Direction | Payload | Description |

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
+import { ChatService } from './chat.service';
 import { PlayerService } from '../player/player.service';
 import { LobbyService } from '../lobby/lobby.service';
 import { ConnectionService, TURN_TIMER_MS, TURN_TIMER_DISCONNECTED_MS } from '../player/connection.service';
@@ -25,6 +26,7 @@ export class GameGateway {
 
   constructor(
     private gameService: GameService,
+    private chatService: ChatService,
     private playerService: PlayerService,
     private lobbyService: LobbyService,
     private connectionService: ConnectionService,
@@ -162,6 +164,83 @@ export class GameGateway {
     this.broadcastState(data.tableId);
   }
 
+  // --- Chat ---
+
+  @SubscribeMessage('chat:send')
+  handleChatSend(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { tableId: string; text: string },
+  ) {
+    const player = this.playerService.get(client.id);
+    if (!player) return;
+
+    // Determine if player or spectator
+    const table = this.gameService.getTable(data.tableId);
+    const isSeated = table?.players.some(p => p.playerId === player.userId);
+    const isSpec = this.spectators.get(data.tableId)?.has(client.id);
+    if (!isSeated && !isSpec) return;
+
+    const type = isSeated ? 'player' : 'spectator';
+    const result = this.chatService.addMessage(data.tableId, player.userId, player.name, data.text, type);
+
+    if (result.error) {
+      client.emit('chat:error', { message: result.error });
+      return;
+    }
+
+    if (result.message) {
+      // Send to everyone in the table room + spectators + previewers
+      this.server.to(data.tableId).emit('chat:message', result.message);
+      // Also send to personalized player sockets (they're in individual rooms)
+      if (table) {
+        for (const p of table.players) {
+          const pd = this.playerService.getByUserId(p.playerId);
+          if (pd && !pd.disconnected) {
+            this.server.to(pd.socketId).emit('chat:message', result.message);
+          }
+        }
+      }
+    }
+  }
+
+  @SubscribeMessage('chat:history')
+  handleChatHistory(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { tableId: string },
+  ) {
+    const history = this.chatService.getHistory(data.tableId);
+    client.emit('chat:history', { tableId: data.tableId, messages: history });
+  }
+
+  private emitDealerMessage(tableId: string, text: string) {
+    const msg = this.chatService.addSystemMessage(tableId, text, 'dealer');
+    this.server.to(tableId).emit('chat:message', msg);
+    // Also to seated players' personal sockets
+    const table = this.gameService.getTable(tableId);
+    if (table) {
+      for (const p of table.players) {
+        const pd = this.playerService.getByUserId(p.playerId);
+        if (pd && !pd.disconnected) {
+          this.server.to(pd.socketId).emit('chat:message', msg);
+        }
+      }
+    }
+  }
+
+  private emitSystemMessage(tableId: string, text: string) {
+    const msg = this.chatService.addSystemMessage(tableId, text, 'system');
+    this.server.to(tableId).emit('chat:message', msg);
+    const table = this.gameService.getTable(tableId);
+    if (table) {
+      for (const p of table.players) {
+        const pd = this.playerService.getByUserId(p.playerId);
+        if (pd && !pd.disconnected) {
+          this.server.to(pd.socketId).emit('chat:message', msg);
+        }
+      }
+    }
+  }
+
   // --- Core game events ---
 
   @SubscribeMessage('game:join')
@@ -186,6 +265,7 @@ export class GameGateway {
     if (specSet) specSet.delete(client.id);
 
     client.join(data.tableId);
+    this.emitSystemMessage(data.tableId, `${player.name} joined the table`);
     this.broadcastState(data.tableId);
     this.server.emit('lobby:tables', this.lobbyService.listTables());
   }
@@ -198,6 +278,7 @@ export class GameGateway {
     const player = this.playerService.get(client.id);
     if (!player) return;
 
+    this.emitSystemMessage(data.tableId, `${player.name} left the table`);
     const state = this.gameService.leaveTable(data.tableId, player.userId);
     client.leave(data.tableId);
     if (state) {
@@ -218,6 +299,7 @@ export class GameGateway {
       client.emit('error', { message: 'Cannot start game (need at least 2 active players)' });
       return;
     }
+    this.emitDealerMessage(data.tableId, `Hand started. Small Blind: $${state.smallBlind}, Big Blind: $${state.bigBlind}`);
     this.broadcastState(data.tableId);
     this.startTurnTimer(data.tableId);
   }
@@ -275,10 +357,27 @@ export class GameGateway {
   }
 
   private processAndBroadcast(tableId: string, userId: string, action: ActionType, amount?: number): { success: boolean; reason?: string } {
+    // Get player name before processing (for chat)
+    const playerData = this.playerService.getByUserId(userId);
+    const playerName = playerData?.name || 'Unknown';
+
     const state = this.gameService.processAction(tableId, userId, action, amount);
     if (!state) {
       return { success: false, reason: 'invalid_action' };
     }
+
+    // Dealer message for action
+    const actionText = action === 'raise' ? `raises to $${amount}` :
+                       action === 'all-in' ? `goes all-in` :
+                       action === 'call' ? `calls` :
+                       action === 'check' ? `checks` :
+                       action === 'fold' ? `folds` : action;
+    this.emitDealerMessage(tableId, `${playerName} ${actionText}`);
+
+    // Phase transition messages
+    if (state.phase === 'flop') this.emitDealerMessage(tableId, '--- Flop ---');
+    else if (state.phase === 'turn') this.emitDealerMessage(tableId, '--- Turn ---');
+    else if (state.phase === 'river') this.emitDealerMessage(tableId, '--- River ---');
 
     // Increment sequence
     const seq = (this.actionSeq.get(tableId) || 0) + 1;
@@ -288,6 +387,13 @@ export class GameGateway {
     this.broadcastState(tableId);
 
     if (state.phase === 'showdown') {
+      // Winner messages
+      if (state.winners) {
+        for (const w of state.winners) {
+          const wp = state.players.find(p => p.playerId === w.playerId);
+          this.emitDealerMessage(tableId, `${wp?.name || 'Unknown'} wins $${w.amount} with ${w.hand}`);
+        }
+      }
       this.handleShowdown(tableId, state);
     } else if (state.phase !== 'waiting') {
       this.startTurnTimer(tableId);
